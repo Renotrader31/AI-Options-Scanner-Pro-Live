@@ -1,0 +1,46 @@
+/**
+ * Trades API Route for Scanner Pro AI
+ * Enhanced for both STOCK and OPTION trading
+ */
+
+import { NextResponse } from 'next/server';
+
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// In-memory storage (in production, use a database)
+let trades = [];
+let tradeIdCounter = 1;
+
+// Handle OPTIONS requests for CORS
+export async function OPTIONS(request) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
+// GET endpoint - fetch trades and analytics
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status');
+    const analytics = searchParams.get('analytics') === 'true';
+    const updatePrices = searchParams.get('updatePrices') === 'true';
+    
+    if (analytics) {
+      const analyticsData = calculateAnalytics(trades);
+      return NextResponse.json({
+        success: true,
+        trades,
+        analytics: analyticsData,
+        timestamp: new Date().toISOString()
+      }, {
+        status: 200,
+        headers: corsHeaders
+      });
+    }

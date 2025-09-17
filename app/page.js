@@ -979,15 +979,28 @@ export default function UltimateScanner() {
             
             const entryPrice = trade.entryPrice || 0; // Entry premium
             const premiumChange = livePrice - entryPrice;
-            livePnl = premiumChange * (trade.quantity || 0) * 100; // Standard option multiplier
+            
+            // 🎯 CRITICAL FIX: Handle BUY vs SELL options correctly
+            if (trade.type === 'SELL' || (trade.type && trade.type.includes('SELL'))) {
+              // SELL TO OPEN: You received premium, profit when price goes DOWN
+              // P&L = (Entry Premium - Current Premium) × Quantity × 100
+              livePnl = -premiumChange * (trade.quantity || 0) * 100; // Negative premium change = positive profit
+            } else {
+              // BUY TO OPEN: You paid premium, profit when price goes UP  
+              // P&L = (Current Premium - Entry Premium) × Quantity × 100
+              livePnl = premiumChange * (trade.quantity || 0) * 100; // Positive premium change = positive profit
+            }
             
             console.log(`📊 LIVE Option P&L for ${trade.symbol}:`, {
               contract: optionContract,
+              tradeType: trade.type,
               entryPremium: entryPrice,
               livePremium: livePrice,
               premiumChange,
               quantity: trade.quantity,
+              isSell: trade.type === 'SELL' || (trade.type && trade.type.includes('SELL')),
               calculatedPnL: livePnl,
+              logic: trade.type === 'SELL' ? 'SELL: Profit when price goes DOWN' : 'BUY: Profit when price goes UP',
               source: 'Polygon Real-Time'
             });
             
@@ -999,13 +1012,24 @@ export default function UltimateScanner() {
               
               const entryPrice = trade.entryPrice || 0;
               const premiumChange = livePrice - entryPrice;
-              livePnl = premiumChange * (trade.quantity || 0) * 100;
+              
+              // 🎯 CRITICAL FIX: Handle BUY vs SELL options correctly (fallback)
+              if (trade.type === 'SELL' || (trade.type && trade.type.includes('SELL'))) {
+                // SELL TO OPEN: You received premium, profit when price goes DOWN
+                livePnl = -premiumChange * (trade.quantity || 0) * 100;
+              } else {
+                // BUY TO OPEN: You paid premium, profit when price goes UP  
+                livePnl = premiumChange * (trade.quantity || 0) * 100;
+              }
               
               console.log(`📊 Stored Option P&L for ${trade.symbol}:`, {
+                tradeType: trade.type,
                 entryPremium: entryPrice,
                 storedPremium: livePrice,
                 premiumChange,
+                isSell: trade.type === 'SELL' || (trade.type && trade.type.includes('SELL')),
                 calculatedPnL: livePnl,
+                logic: trade.type === 'SELL' ? 'SELL: Profit when price goes DOWN' : 'BUY: Profit when price goes UP',
                 source: 'Stored Data'
               });
             } else {

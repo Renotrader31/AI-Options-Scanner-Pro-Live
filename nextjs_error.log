@@ -1,0 +1,1048 @@
+ ⚠ Found a change in next.config.js. Restarting the server to apply the changes...
+ ⚠ Invalid next.config.js options detected: 
+ ⚠     Unrecognized key(s) in object: 'appDir' at "experimental"
+ ⚠     Unrecognized key(s) in object: 'api'
+ ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+ ⚠ Found a change in next.config.js. Restarting the server to apply the changes...
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+🧠 Learning analysis error: ReferenceError: analyzeRiskAdjustedPerformance is not defined
+    at generateLearningEnhancedAnalysis (webpack-internal:///(rsc)/./app/api/ml-learning/route.js:87:30)
+    at POST (webpack-internal:///(rsc)/./app/api/ml-learning/route.js:44:40)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:55038
+    at async ek.execute (/home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:45808)
+    at async ek.handle (/home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:56292)
+    at async doRender (/home/user/webapp/node_modules/next/dist/server/base-server.js:1377:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/user/webapp/node_modules/next/dist/server/base-server.js:1599:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:1507:28)
+    at async DevServer.renderPageComponent (/home/user/webapp/node_modules/next/dist/server/base-server.js:1931:24)
+    at async DevServer.renderToResponseImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:1969:32)
+    at async DevServer.pipeImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:920:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/user/webapp/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:816:17)
+    at async /home/user/webapp/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/user/webapp/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:174:21)
+    at async handleRequest (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:353:24)
+    at async requestHandlerImpl (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:377:13)
+    at async Server.requestListener (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:141:13)
+🧠 ML Learning error: ReferenceError: analyzeRiskAdjustedPerformance is not defined
+    at generateLearningEnhancedAnalysis (webpack-internal:///(rsc)/./app/api/ml-learning/route.js:87:30)
+    at POST (webpack-internal:///(rsc)/./app/api/ml-learning/route.js:44:40)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:55038
+    at async ek.execute (/home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:45808)
+    at async ek.handle (/home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:56292)
+    at async doRender (/home/user/webapp/node_modules/next/dist/server/base-server.js:1377:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/user/webapp/node_modules/next/dist/server/base-server.js:1599:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:1507:28)
+    at async DevServer.renderPageComponent (/home/user/webapp/node_modules/next/dist/server/base-server.js:1931:24)
+    at async DevServer.renderToResponseImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:1969:32)
+    at async DevServer.pipeImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:920:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/user/webapp/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:816:17)
+    at async /home/user/webapp/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/user/webapp/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:174:21)
+    at async handleRequest (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:353:24)
+    at async requestHandlerImpl (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:377:13)
+    at async Server.requestListener (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:141:13)
+🧠 Learning analysis error: ReferenceError: analyzeRiskAdjustedPerformance is not defined
+    at generateLearningEnhancedAnalysis (webpack-internal:///(rsc)/./app/api/ml-learning/route.js:87:30)
+    at POST (webpack-internal:///(rsc)/./app/api/ml-learning/route.js:44:40)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:55038
+    at async ek.execute (/home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:45808)
+    at async ek.handle (/home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:56292)
+    at async doRender (/home/user/webapp/node_modules/next/dist/server/base-server.js:1377:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/user/webapp/node_modules/next/dist/server/base-server.js:1599:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:1507:28)
+    at async DevServer.renderPageComponent (/home/user/webapp/node_modules/next/dist/server/base-server.js:1931:24)
+    at async DevServer.renderToResponseImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:1969:32)
+    at async DevServer.pipeImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:920:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/user/webapp/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:816:17)
+    at async /home/user/webapp/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/user/webapp/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:174:21)
+    at async handleRequest (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:353:24)
+    at async requestHandlerImpl (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:377:13)
+    at async Server.requestListener (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:141:13)
+🧠 ML Learning error: ReferenceError: analyzeRiskAdjustedPerformance is not defined
+    at generateLearningEnhancedAnalysis (webpack-internal:///(rsc)/./app/api/ml-learning/route.js:87:30)
+    at POST (webpack-internal:///(rsc)/./app/api/ml-learning/route.js:44:40)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:55038
+    at async ek.execute (/home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:45808)
+    at async ek.handle (/home/user/webapp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:56292)
+    at async doRender (/home/user/webapp/node_modules/next/dist/server/base-server.js:1377:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/user/webapp/node_modules/next/dist/server/base-server.js:1599:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:1507:28)
+    at async DevServer.renderPageComponent (/home/user/webapp/node_modules/next/dist/server/base-server.js:1931:24)
+    at async DevServer.renderToResponseImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:1969:32)
+    at async DevServer.pipeImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:920:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/user/webapp/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/user/webapp/node_modules/next/dist/server/base-server.js:816:17)
+    at async /home/user/webapp/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/user/webapp/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:174:21)
+    at async handleRequest (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:353:24)
+    at async requestHandlerImpl (/home/user/webapp/node_modules/next/dist/server/lib/router-server.js:377:13)
+    at async Server.requestListener (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:141:13)
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:191:11)
+    at /home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:52
+    at Span.traceAsyncFn (/home/user/webapp/node_modules/next/dist/trace/trace.js:154:26)
+    at process.<anonymous> (/home/user/webapp/node_modules/next/dist/server/lib/start-server.js:310:35)
+    at process.emit (node:events:524:28) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}

@@ -206,49 +206,7 @@ async function fetchFromPolygon(symbols) {
   }
 }
 
-// FMP API implementation - PAID ACCOUNT
-async function fetchFromFMP(symbols) {
-  const apiKey = API_KEYS.FMP;
-  
-  // Skip demo/invalid keys
-  if (!apiKey || apiKey === 'demo') {
-    throw new Error('FMP API key not configured - skipping FMP');
-  }
-  
-  const symbolList = symbols.join(',');
-  const url = `https://financialmodelingprep.com/api/v3/quote/${symbolList}?apikey=${apiKey}`;
-  
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'Scanner-Pro-AI/1.0'
-    },
-    timeout: 10000
-  });
-  
-  if (!response.ok) {
-    throw new Error(`FMP API error: ${response.status} ${response.statusText}`);
-  }
-  
-  const data = await response.json();
-  
-  if (!Array.isArray(data) || data.length === 0) {
-    throw new Error('FMP returned no data');
-  }
-  
-  return data.map(item => ({
-    symbol: item.symbol,
-    price: item.price || 0,
-    change: item.change || 0,
-    changePercent: item.changesPercentage || 0,
-    volume: item.volume || 0,
-    avgVolume: item.avgVolume || item.volume || 0,
-    marketCap: item.marketCap || 0,
-    high: item.dayHigh || item.price || 0,
-    low: item.dayLow || item.price || 0,
-    open: item.open || item.price || 0,
-    previousClose: item.previousClose || item.price || 0
-  }));
-}
+
 
 // FMP API implementation - PAID ACCOUNT OPTIMIZED
 async function fetchFromFMP(symbols) {
@@ -356,6 +314,70 @@ async function fetchFromFMP(symbols) {
     
   } catch (error) {
     console.error('❌ FMP PAID API failed:', error.message);
+    throw error;
+  }
+}
+
+// Finnhub API implementation (free tier backup)
+async function fetchFromFinnhub(symbols) {
+  try {
+    console.log('🔗 Using Finnhub free API (backup source)');
+    
+    // Use demo/sandbox token for free tier
+    const apiKey = 'sandbox_c5v2hr9r01qvb8ejpuggc5v2hr9r01qvb8ejpuh0';
+    const results = [];
+    
+    for (const symbol of symbols) {
+      const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`;
+      
+      const response = await fetch(url, {
+        timeout: 10000
+      });
+      
+      if (!response.ok) {
+        console.warn(`Finnhub API error for ${symbol}: ${response.status}`);
+        continue;
+      }
+      
+      const data = await response.json();
+      
+      if (!data.c || data.c <= 0) {
+        console.warn(`Invalid Finnhub data for ${symbol}`);
+        continue;
+      }
+      
+      const currentPrice = data.c; // Current price
+      const previousClose = data.pc; // Previous close
+      const change = currentPrice - previousClose;
+      const changePercent = (change / previousClose) * 100;
+      
+      results.push({
+        symbol: symbol,
+        price: Math.round(currentPrice * 100) / 100,
+        change: Math.round(change * 100) / 100,
+        changePercent: Math.round(changePercent * 100) / 100,
+        volume: 0, // Not available in free tier
+        avgVolume: 0,
+        marketCap: 0,
+        high: data.h || currentPrice, // Day high
+        low: data.l || currentPrice, // Day low
+        open: data.o || currentPrice, // Day open
+        previousClose: previousClose
+      });
+      
+      // Rate limit for free tier
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    if (results.length > 0) {
+      console.log(`✅ Finnhub: Got ${results.length} prices (free tier)`);
+      return results;
+    } else {
+      throw new Error('Finnhub returned no valid data');
+    }
+    
+  } catch (error) {
+    console.error('❌ Finnhub failed:', error.message);
     throw error;
   }
 }

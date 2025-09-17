@@ -893,7 +893,7 @@ export default function UltimateScanner() {
     return sortedTrades;
   };
 
-  // 🔄 UPDATE LIVE PORTFOLIO PRICES (ML-Safe Design)
+  // 🔄 UPDATE LIVE PORTFOLIO PRICES (ML-Safe Design with Options Support)
   const updateLivePortfolioPrices = async () => {
     if (!trades || trades.length === 0) {
       console.log('📊 No trades to update');
@@ -910,49 +910,123 @@ export default function UltimateScanner() {
       console.log('📡 Fetching live prices for portfolio update...');
       setSuccessMessage('📡 Updating portfolio prices...');
       
-      // Get unique symbols from active trades
-      const symbols = [...new Set(activeTrades.map(t => t.symbol))];
-      console.log('📊 Updating prices for symbols:', symbols);
+      // Separate stocks and options
+      const stockTrades = activeTrades.filter(t => t.assetType === 'STOCK');
+      const optionTrades = activeTrades.filter(t => t.assetType === 'OPTION');
       
-      // Fetch current prices (use Yahoo Finance for reliability)
-      const priceResponse = await fetch(`/api/live-data?symbols=${symbols.join(',')}`);
-      const priceData = await priceResponse.json();
+      console.log(`📊 Updating prices: ${stockTrades.length} stocks, ${optionTrades.length} options`);
       
-      if (!priceData.success) {
-        throw new Error('Failed to fetch live prices');
+      let stockPriceData = { data: [], success: true };
+      let optionPriceData = { data: [], success: true };
+      
+      // Fetch stock prices if needed
+      if (stockTrades.length > 0) {
+        const stockSymbols = [...new Set(stockTrades.map(t => t.symbol))];
+        const stockResponse = await fetch(`/api/live-data?symbols=${stockSymbols.join(',')}`);
+        stockPriceData = await stockResponse.json();
+        
+        if (!stockPriceData.success) {
+          throw new Error('Failed to fetch stock prices');
+        }
       }
+      
+      // Fetch option prices if needed
+      if (optionTrades.length > 0) {
+        const optionContracts = optionTrades.map(t => generateOptionContract(t)).filter(c => c);
+        
+        if (optionContracts.length > 0) {
+          console.log('📊 Fetching option contracts:', optionContracts);
+          const optionResponse = await fetch(`/api/options-data?contracts=${optionContracts.join(',')}`);
+          optionPriceData = await optionResponse.json();
+          
+          if (!optionPriceData.success) {
+            console.warn('⚠️ Options data fetch failed, using stored prices:', optionPriceData.error);
+          }
+        }
+      }
+      
+
 
       // 🛡️ ML-SAFE: Update trades with live prices WITHOUT affecting original ML data
       const updatedTrades = trades.map(trade => {
         if (trade.status !== 'active') return trade;
         
-        const symbolData = priceData.data.find(d => d.symbol === trade.symbol);
-        if (!symbolData) return trade;
-        
-        const livePrice = symbolData.price;
-        const entryPrice = trade.entryPrice || 0;
-        
-        // Calculate live P&L (preserving original pnl for ML)
+        let livePrice = 0;
         let livePnl = 0;
+        let priceSource = 'NO_DATA';
+        
         if (trade.assetType === 'STOCK') {
-          livePnl = (livePrice - entryPrice) * (trade.quantity || 0);
-          if (trade.type === 'SELL') livePnl = -livePnl; // Short positions
-        } else if (trade.assetType === 'OPTION' || trade.assetType === 'MULTI_LEG_OPTION') {
-          // For options, estimate P&L (simplified - could be enhanced)
-          const priceChange = livePrice - entryPrice;
-          const optionMultiplier = trade.assetType === 'MULTI_LEG_OPTION' ? 1 : 100;
-          livePnl = priceChange * (trade.quantity || 0) * optionMultiplier * 0.3; // Delta approximation
+          // Handle stock price updates
+          const stockData = stockPriceData.data.find(d => d.symbol === trade.symbol);
+          if (stockData) {
+            livePrice = stockData.price;
+            priceSource = stockPriceData.source || 'STOCK_API';
+            
+            const entryPrice = trade.entryPrice || 0;
+            livePnl = (livePrice - entryPrice) * (trade.quantity || 0);
+            if (trade.type === 'SELL') livePnl = -livePnl; // Short positions
+          }
+          
+        } else if (trade.assetType === 'OPTION') {
+          // 🎯 NEW: Handle option price updates with real option data
+          const optionContract = generateOptionContract(trade);
+          const optionData = optionPriceData.data.find(d => d.contract === optionContract);
+          
+          if (optionData && optionData.status === 'SUCCESS') {
+            // Use real-time option price from Polygon
+            livePrice = optionData.lastPrice || optionData.midPrice || 0;
+            priceSource = 'POLYGON_OPTIONS';
+            
+            const entryPrice = trade.entryPrice || 0; // Entry premium
+            const premiumChange = livePrice - entryPrice;
+            livePnl = premiumChange * (trade.quantity || 0) * 100; // Standard option multiplier
+            
+            console.log(`📊 LIVE Option P&L for ${trade.symbol}:`, {
+              contract: optionContract,
+              entryPremium: entryPrice,
+              livePremium: livePrice,
+              premiumChange,
+              quantity: trade.quantity,
+              calculatedPnL: livePnl,
+              source: 'Polygon Real-Time'
+            });
+            
+          } else {
+            // Fallback: Use stored option price if live data unavailable
+            if (trade.currentPrice && trade.currentPrice !== trade.entryPrice) {
+              livePrice = trade.currentPrice;
+              priceSource = 'STORED';
+              
+              const entryPrice = trade.entryPrice || 0;
+              const premiumChange = livePrice - entryPrice;
+              livePnl = premiumChange * (trade.quantity || 0) * 100;
+              
+              console.log(`📊 Stored Option P&L for ${trade.symbol}:`, {
+                entryPremium: entryPrice,
+                storedPremium: livePrice,
+                premiumChange,
+                calculatedPnL: livePnl,
+                source: 'Stored Data'
+              });
+            } else {
+              console.log(`⚠️ No option price data available for ${trade.symbol} (${optionContract})`);
+            }
+          }
         }
         
+        // Skip trades with no price data
+        if (livePrice === 0 && priceSource === 'NO_DATA') return trade;
+        
+        const entryPrice = trade.entryPrice || 0;
         const livePnlPercent = entryPrice > 0 ? (livePnl / (entryPrice * (trade.quantity || 1))) * 100 : 0;
         
         return {
           ...trade,
-          liveCurrentPrice: livePrice, // 🎯 NEW: Live price (separate from ML currentPrice)
-          livePnl: Math.round(livePnl * 100) / 100, // 🎯 NEW: Live P&L (separate from ML pnl)
-          livePnlPercent: Math.round(livePnlPercent * 100) / 100, // 🎯 NEW: Live P&L %
-          lastPriceUpdate: new Date().toISOString(), // 🎯 NEW: Timestamp of last update
-          priceSource: priceData.source || 'UNKNOWN' // 🎯 NEW: Data source tracking
+          liveCurrentPrice: livePrice, // 🎯 Live price (stock price or option premium)
+          livePnl: Math.round(livePnl * 100) / 100, // 🎯 Live P&L calculated correctly
+          livePnlPercent: Math.round(livePnlPercent * 100) / 100, // 🎯 Live P&L %
+          lastPriceUpdate: new Date().toISOString(), // 🎯 Timestamp of last update
+          priceSource: priceSource // 🎯 Data source tracking (POLYGON_OPTIONS, STOCK_API, etc.)
         };
       });
       
@@ -967,12 +1041,56 @@ export default function UltimateScanner() {
       calculateLocalAnalytics(updatedTrades);
       
       const updatedCount = updatedTrades.filter(t => t.lastPriceUpdate).length;
-      setSuccessMessage(`✅ Updated ${updatedCount} positions with live prices (Source: ${priceData.source})`);
+      const optionsCount = updatedTrades.filter(t => t.priceSource === 'POLYGON_OPTIONS').length;
+      const stocksCount = updatedTrades.filter(t => t.priceSource && t.priceSource !== 'POLYGON_OPTIONS' && t.priceSource !== 'NO_DATA').length;
+      
+      setSuccessMessage(`✅ Updated ${updatedCount} positions: ${stocksCount} stocks, ${optionsCount} options with live prices`);
       console.log('📊 Portfolio prices updated successfully');
       
     } catch (error) {
       console.error('❌ Portfolio price update failed:', error);
       setError(`Price update failed: ${error.message}`);
+    }
+  };
+
+  // 📊 Generate Polygon option contract symbol from trade data
+  const generateOptionContract = (trade) => {
+    if (!trade.symbol || !trade.expirationDate || !trade.strikePrice || !trade.optionType) {
+      console.warn('⚠️ Missing option data for contract generation:', trade);
+      return null;
+    }
+
+    try {
+      // Parse expiration date (assume YYYY-MM-DD format)
+      const expDate = new Date(trade.expirationDate);
+      if (isNaN(expDate.getTime())) {
+        console.warn('⚠️ Invalid expiration date:', trade.expirationDate);
+        return null;
+      }
+
+      // Format: SYMBOLYYMMDDCTSSSSSSSS
+      // Where: YY=year, MM=month, DD=day, C/P=call/put, SSSSSSSS=strike*1000
+      const symbol = trade.symbol.toUpperCase();
+      const yy = expDate.getFullYear().toString().slice(-2); // Last 2 digits of year
+      const mm = String(expDate.getMonth() + 1).padStart(2, '0'); // Month (01-12)
+      const dd = String(expDate.getDate()).padStart(2, '0'); // Day (01-31)
+      const type = trade.optionType === 'CALL' ? 'C' : 'P';
+      const strike = String(Math.round(trade.strikePrice * 1000)).padStart(8, '0'); // Strike in cents, 8 digits
+      
+      const contract = `${symbol}${yy}${mm}${dd}${type}${strike}`;
+      
+      console.log(`📊 Generated option contract: ${contract}`, {
+        symbol: trade.symbol,
+        expiration: trade.expirationDate,
+        strike: trade.strikePrice,
+        type: trade.optionType,
+        formatted: { yy, mm, dd, type, strike }
+      });
+      
+      return contract;
+    } catch (error) {
+      console.error('❌ Error generating option contract:', error, trade);
+      return null;
     }
   };
 

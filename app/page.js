@@ -1101,7 +1101,34 @@ export default function UltimateScanner() {
     if (!analysis) return [];
 
     const symbol = analysis.symbol || tradeForm.symbol || 'SPY';
-    const basePrice = Math.random() * 300 + 150; // Mock current stock price (TODO: Replace with real data)
+    
+    // 🎯 FIXED: Use REAL market price from live data API
+    let basePrice = 659; // Default SPY fallback
+    
+    // Try to get actual current price from live data
+    try {
+      if (liveData?.data) {
+        const symbolData = liveData.data.find(item => item.symbol === symbol);
+        if (symbolData && symbolData.price) {
+          basePrice = symbolData.price;
+          console.log(`✅ Using live price for ${symbol}: $${basePrice} (from cached data)`);
+        }
+      }
+      
+      // If no cached data, fetch fresh live data
+      if (!liveData?.data || !liveData.data.find(item => item.symbol === symbol)) {
+        console.log(`📡 Fetching fresh price data for ${symbol}...`);
+        const liveResponse = await fetch(`/api/live-data?symbols=${symbol}&limit=1`);
+        const liveResult = await liveResponse.json();
+        if (liveResult.success && liveResult.data && liveResult.data.length > 0) {
+          basePrice = liveResult.data[0].price;
+          console.log(`✅ Fetched live price for ${symbol}: $${basePrice} (from ${liveResult.source})`);
+        }
+      }
+    } catch (error) {
+      console.warn(`⚠️ Could not fetch live price for ${symbol}, using fallback:`, basePrice);
+    }
+
     const iv = Math.random() * 0.8 + 0.2; // Implied volatility 20-100%
     let confidence = analysis.confidence || 0.75;
     let strategies = [];
@@ -1136,12 +1163,19 @@ export default function UltimateScanner() {
       }
     }
 
-    // Calculate option strikes based on current price
-    const atm = Math.round(basePrice);
-    const otm = Math.round(basePrice * 1.05);
-    const itm = Math.round(basePrice * 0.95);
-    const farOtm = Math.round(basePrice * 1.10);
-    const farItm = Math.round(basePrice * 0.90);
+    // 🎯 REALISTIC strike price calculations for options
+    // Round strikes to standard increments ($5 for SPY, $1-5 for stocks depending on price)
+    const strikeIncrement = basePrice > 200 ? 5 : (basePrice > 50 ? 2.5 : 1);
+    
+    const atm = Math.round(basePrice / strikeIncrement) * strikeIncrement; // At-the-money
+    const otm = atm + strikeIncrement; // 1 strike out-of-the-money  
+    const itm = atm - strikeIncrement; // 1 strike in-the-money
+    const farOtm = atm + (strikeIncrement * 2); // 2 strikes out-of-the-money
+    const farItm = atm - (strikeIncrement * 2); // 2 strikes in-the-money
+    
+    console.log(`🎯 Strike calculations for ${symbol} at $${basePrice}:`, {
+      ATM: atm, ITM: itm, OTM: otm, FarITM: farItm, FarOTM: farOtm, increment: strikeIncrement
+    });
 
     // Generate expiration dates
     const nearExpiry = new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString();
@@ -1149,6 +1183,9 @@ export default function UltimateScanner() {
     const farExpiry = new Date(Date.now() + 45*24*60*60*1000).toLocaleDateString();
 
     // 1. LONG CALL - Basic bullish strategy
+    const longCallPremium = Math.max(2, basePrice * 0.01); // Realistic premium: $2 minimum or 1% of stock price
+    const longCallBreakeven = otm + longCallPremium;
+    
     strategies.push({
       type: 'long_call',
       bias: 'BULLISH',
@@ -1156,16 +1193,16 @@ export default function UltimateScanner() {
       confidence: Math.round((confidence * 100 - 5)),
       title: `Long Call ${symbol} ${otm}C Expiring ${nearExpiry}`,
       bullets: [
-        `Buy ${symbol} ${otm} Call for $${(basePrice * 0.03).toFixed(2)} premium`,
+        `Buy ${symbol} ${otm} Call for $${longCallPremium.toFixed(2)} premium`,
         `Maximum profit potential: Unlimited above ${otm}`,
-        `Breakeven: $${(otm + basePrice * 0.03).toFixed(2)}`,
+        `Breakeven: $${longCallBreakeven.toFixed(2)}`,
         `Best if ${symbol} moves above ${otm} before expiration`
       ],
-      entryPrice: (basePrice * 0.03).toFixed(2),
-      target: (basePrice * 0.06).toFixed(2),
-      stopLoss: (basePrice * 0.015).toFixed(2),
+      entryPrice: longCallPremium.toFixed(2),
+      target: (longCallPremium * 2).toFixed(2),
+      stopLoss: (longCallPremium * 0.5).toFixed(2),
       positionSize: '10 contracts',
-      maxRisk: (basePrice * 0.03 * 10 * 100).toFixed(0),
+      maxRisk: (longCallPremium * 10 * 100).toFixed(0),
       maxReward: 'Unlimited',
       rrRatio: '3.0',
       winProb: '65',
@@ -1174,7 +1211,12 @@ export default function UltimateScanner() {
       dte: '7'
     });
 
-    // 2. JADE LIZARD - Advanced neutral/bullish strategy (USER REQUESTED)
+    // 2. JADE LIZARD - Advanced neutral/bullish strategy (USER REQUESTED)  
+    const jadeSellCall = Math.max(1.5, basePrice * 0.005); // Realistic OTM call credit
+    const jadeSellPut = Math.max(3, basePrice * 0.008); // Realistic put credit
+    const jadeBuyPut = Math.max(2, basePrice * 0.006); // Realistic put debit
+    const jadeNetCredit = jadeSellCall + jadeSellPut - jadeBuyPut;
+    
     strategies.push({
       type: 'jade_lizard',
       bias: 'NEUTRAL-BULLISH',
@@ -1182,17 +1224,17 @@ export default function UltimateScanner() {
       confidence: Math.round((confidence * 100 + 5)),
       title: `Jade Lizard ${symbol} - Sell ${farOtm}C, Buy ${otm}P-${itm}P Spread`,
       bullets: [
-        `Sell ${symbol} ${farOtm} Call for $${(basePrice * 0.015).toFixed(2)} credit`,
-        `Sell ${symbol} ${otm} Put for $${(basePrice * 0.025).toFixed(2)} credit`,
-        `Buy ${symbol} ${itm} Put for $${(basePrice * 0.015).toFixed(2)} debit`,
-        `Net Credit: $${(basePrice * 0.025).toFixed(2)} | No upside risk | Limited downside risk`
+        `Sell ${symbol} ${farOtm} Call for $${jadeSellCall.toFixed(2)} credit`,
+        `Sell ${symbol} ${otm} Put for $${jadeSellPut.toFixed(2)} credit`, 
+        `Buy ${symbol} ${itm} Put for $${jadeBuyPut.toFixed(2)} debit`,
+        `Net Credit: $${jadeNetCredit.toFixed(2)} | No upside risk | Limited downside risk`
       ],
-      entryPrice: (basePrice * 0.025).toFixed(2),
-      target: (basePrice * 0.0125).toFixed(2),
-      stopLoss: (basePrice * 0.04).toFixed(2),
+      entryPrice: jadeNetCredit.toFixed(2),
+      target: (jadeNetCredit * 0.5).toFixed(2),
+      stopLoss: (jadeNetCredit * -2).toFixed(2),
       positionSize: '5 contracts',
-      maxRisk: ((otm - itm - basePrice * 0.025) * 5 * 100).toFixed(0),
-      maxReward: (basePrice * 0.025 * 5 * 100).toFixed(0),
+      maxRisk: ((otm - itm - jadeNetCredit) * 5 * 100).toFixed(0),
+      maxReward: (jadeNetCredit * 5 * 100).toFixed(0),
       rrRatio: '1.8',
       winProb: '75',
       timeHorizon: '21-30 days',

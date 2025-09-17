@@ -174,6 +174,17 @@ export default function UltimateScanner() {
           setTrades(parsedTrades);
           calculateLocalAnalytics(parsedTrades);
           console.log('📂 Restored', parsedTrades.length, 'trades from browser storage:', parsedTrades);
+          
+          // 🕐 Auto-update portfolio prices if trades are active and it's been a while
+          const hasActiveTrades = parsedTrades.some(t => t.status === 'active');
+          const lastUpdate = localStorage.getItem('lastPortfolioPriceUpdate');
+          const now = Date.now();
+          const fourHours = 4 * 60 * 60 * 1000; // 4 hours in ms
+          
+          if (hasActiveTrades && (!lastUpdate || (now - parseInt(lastUpdate)) > fourHours)) {
+            console.log('📡 Auto-updating portfolio prices (4+ hours since last update)');
+            setTimeout(() => updateLivePortfolioPrices(), 2000); // Delay to let UI load first
+          }
         } catch (e) {
           console.log('⚠️ Could not restore saved trades:', e);
           setTrades([]);
@@ -882,21 +893,108 @@ export default function UltimateScanner() {
     return sortedTrades;
   };
 
+  // 🔄 UPDATE LIVE PORTFOLIO PRICES (ML-Safe Design)
+  const updateLivePortfolioPrices = async () => {
+    if (!trades || trades.length === 0) {
+      console.log('📊 No trades to update');
+      return;
+    }
+
+    const activeTrades = trades.filter(t => t.status === 'active');
+    if (activeTrades.length === 0) {
+      console.log('📊 No active trades to update');
+      return;
+    }
+
+    try {
+      console.log('📡 Fetching live prices for portfolio update...');
+      setSuccessMessage('📡 Updating portfolio prices...');
+      
+      // Get unique symbols from active trades
+      const symbols = [...new Set(activeTrades.map(t => t.symbol))];
+      console.log('📊 Updating prices for symbols:', symbols);
+      
+      // Fetch current prices (use Yahoo Finance for reliability)
+      const priceResponse = await fetch(`/api/live-data?symbols=${symbols.join(',')}`);
+      const priceData = await priceResponse.json();
+      
+      if (!priceData.success) {
+        throw new Error('Failed to fetch live prices');
+      }
+
+      // 🛡️ ML-SAFE: Update trades with live prices WITHOUT affecting original ML data
+      const updatedTrades = trades.map(trade => {
+        if (trade.status !== 'active') return trade;
+        
+        const symbolData = priceData.data.find(d => d.symbol === trade.symbol);
+        if (!symbolData) return trade;
+        
+        const livePrice = symbolData.price;
+        const entryPrice = trade.entryPrice || 0;
+        
+        // Calculate live P&L (preserving original pnl for ML)
+        let livePnl = 0;
+        if (trade.assetType === 'STOCK') {
+          livePnl = (livePrice - entryPrice) * (trade.quantity || 0);
+          if (trade.type === 'SELL') livePnl = -livePnl; // Short positions
+        } else if (trade.assetType === 'OPTION' || trade.assetType === 'MULTI_LEG_OPTION') {
+          // For options, estimate P&L (simplified - could be enhanced)
+          const priceChange = livePrice - entryPrice;
+          const optionMultiplier = trade.assetType === 'MULTI_LEG_OPTION' ? 1 : 100;
+          livePnl = priceChange * (trade.quantity || 0) * optionMultiplier * 0.3; // Delta approximation
+        }
+        
+        const livePnlPercent = entryPrice > 0 ? (livePnl / (entryPrice * (trade.quantity || 1))) * 100 : 0;
+        
+        return {
+          ...trade,
+          liveCurrentPrice: livePrice, // 🎯 NEW: Live price (separate from ML currentPrice)
+          livePnl: Math.round(livePnl * 100) / 100, // 🎯 NEW: Live P&L (separate from ML pnl)
+          livePnlPercent: Math.round(livePnlPercent * 100) / 100, // 🎯 NEW: Live P&L %
+          lastPriceUpdate: new Date().toISOString(), // 🎯 NEW: Timestamp of last update
+          priceSource: priceData.source || 'UNKNOWN' // 🎯 NEW: Data source tracking
+        };
+      });
+      
+      // Update state and localStorage
+      setTrades(updatedTrades);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('scannerProTrades', JSON.stringify(updatedTrades));
+        localStorage.setItem('lastPortfolioPriceUpdate', Date.now().toString());
+      }
+      
+      // Recalculate analytics (using ORIGINAL pnl for ML, live data for display)
+      calculateLocalAnalytics(updatedTrades);
+      
+      const updatedCount = updatedTrades.filter(t => t.lastPriceUpdate).length;
+      setSuccessMessage(`✅ Updated ${updatedCount} positions with live prices (Source: ${priceData.source})`);
+      console.log('📊 Portfolio prices updated successfully');
+      
+    } catch (error) {
+      console.error('❌ Portfolio price update failed:', error);
+      setError(`Price update failed: ${error.message}`);
+    }
+  };
+
   // Calculate analytics from local trades data
   const calculateLocalAnalytics = (tradesData) => {
     const closedTrades = tradesData.filter(t => t.status === 'closed');
     const activeTrades = tradesData.filter(t => t.status === 'active');
     
+    // 🎯 Use ORIGINAL pnl for ML analytics, but show live P&L in UI when available
     const totalPnL = closedTrades.reduce((sum, trade) => sum + (trade.pnl || 0), 0);
+    const liveTotalPnL = activeTrades.reduce((sum, trade) => sum + (trade.livePnl || trade.pnl || 0), 0) + totalPnL;
     const winningTrades = closedTrades.filter(t => t.pnl > 0).length;
     const winRate = closedTrades.length > 0 ? (winningTrades / closedTrades.length) * 100 : 0;
     
     const localAnalytics = {
-      totalPnL: Math.round(totalPnL * 100) / 100,
+      totalPnL: Math.round(totalPnL * 100) / 100, // ML-safe: Original closed P&L
+      liveTotalPnL: Math.round(liveTotalPnL * 100) / 100, // Live: Real-time total P&L
       winRate: Math.round(winRate * 10) / 10,
       activeTrades: activeTrades.length,
       closedTrades: closedTrades.length,
       totalTrades: tradesData.length,
+      hasLivePrices: activeTrades.some(t => t.liveCurrentPrice), // Indicator for live data
       mlScore: 85.5, // Mock ML score
       sharpeRatio: totalPnL > 0 ? 1.2 : 0.8 // Simple mock calculation
     };
@@ -2110,20 +2208,37 @@ export default function UltimateScanner() {
                   </h2>
                   <div className="flex items-center gap-2 text-slate-400">
                     <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-                    <span className="font-medium text-green-400">Live P&L Tracking with Options Support</span>
+                    <span className="font-medium text-green-400">
+                      Live P&L Tracking with Options Support
+                      {analytics?.hasLivePrices && (
+                        <span className="text-xs bg-green-700 px-2 py-0.5 rounded ml-2">
+                          🔴 LIVE
+                        </span>
+                      )}
+                    </span>
                   </div>
                 </div>
                 
-                <button 
-                  onClick={() => {
-                    fetchTrades(null, true);
-                    fetchAnalytics();
-                  }}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                  disabled={loading}
-                >
-                  {loading ? '🔄 Updating...' : '📊 Refresh P&L'}
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={updateLivePortfolioPrices}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm flex items-center gap-1"
+                    disabled={loading}
+                  >
+                    📡 {loading ? 'Updating...' : 'Live Prices'}
+                  </button>
+                  
+                  <button 
+                    onClick={() => {
+                      fetchTrades(null, true);
+                      fetchAnalytics();
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
+                    disabled={loading}
+                  >
+                    {loading ? '🔄 Updating...' : '📊 Refresh'}
+                  </button>
+                </div>
               </div>
 
               {/* Portfolio Performance Metrics */}
@@ -2132,11 +2247,19 @@ export default function UltimateScanner() {
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 text-green-400 mb-1">
                       <span className="text-lg">💰</span>
+                      {analytics.hasLivePrices && <span className="text-xs">🔴</span>}
                     </div>
-                    <div className="text-sm text-slate-400">Total P&L</div>
-                    <div className={`text-xl font-bold ${analytics.totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      ${analytics.totalPnL?.toLocaleString()}
+                    <div className="text-sm text-slate-400">
+                      {analytics.hasLivePrices ? 'Live P&L' : 'Total P&L'}
                     </div>
+                    <div className={`text-xl font-bold ${(analytics.liveTotalPnL ?? analytics.totalPnL) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      ${(analytics.liveTotalPnL ?? analytics.totalPnL)?.toLocaleString()}
+                    </div>
+                    {analytics.hasLivePrices && analytics.liveTotalPnL !== analytics.totalPnL && (
+                      <div className="text-xs text-slate-500 mt-1">
+                        Static: ${analytics.totalPnL?.toLocaleString()}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="text-center">
@@ -2833,17 +2956,31 @@ export default function UltimateScanner() {
                         <td className="py-2 text-right">{trade.quantity}</td>
                         <td className="py-2 text-right">${trade.entryPrice?.toFixed(2)}</td>
                         <td className="py-2 text-right">
-                          ${(trade.currentPrice || trade.exitPrice || trade.entryPrice)?.toFixed(2)}
+                          <div className="flex flex-col items-end">
+                            <span className={trade.liveCurrentPrice ? 'text-blue-400 font-medium' : ''}>
+                              ${(trade.liveCurrentPrice || trade.currentPrice || trade.exitPrice || trade.entryPrice)?.toFixed(2)}
+                            </span>
+                            {trade.liveCurrentPrice && (
+                              <span className="text-xs text-green-400">🔴 Live</span>
+                            )}
+                          </div>
                         </td>
                         <td className={`py-2 text-right font-medium ${
-                          trade.pnl > 0 ? 'text-green-400' : trade.pnl < 0 ? 'text-red-400' : 'text-slate-400'
+                          (trade.livePnl ?? trade.pnl ?? 0) > 0 ? 'text-green-400' : (trade.livePnl ?? trade.pnl ?? 0) < 0 ? 'text-red-400' : 'text-slate-400'
                         }`}>
-                          ${trade.pnl?.toFixed(2)}
+                          <div className="flex flex-col items-end">
+                            <span>${(trade.livePnl ?? trade.pnl ?? 0)?.toFixed(2)}</span>
+                            {trade.livePnl !== undefined && trade.livePnl !== trade.pnl && (
+                              <span className="text-xs text-slate-500">
+                                Static: ${trade.pnl?.toFixed(2) || '0.00'}
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className={`py-2 text-right font-medium ${
-                          trade.pnlPercent > 0 ? 'text-green-400' : trade.pnlPercent < 0 ? 'text-red-400' : 'text-slate-400'
+                          (trade.livePnlPercent ?? trade.pnlPercent ?? 0) > 0 ? 'text-green-400' : (trade.livePnlPercent ?? trade.pnlPercent ?? 0) < 0 ? 'text-red-400' : 'text-slate-400'
                         }`}>
-                          {trade.pnlPercent?.toFixed(2)}%
+                          {(trade.livePnlPercent ?? trade.pnlPercent ?? 0)?.toFixed(2)}%
                         </td>
                         <td className="py-2">
                           <span className={`px-2 py-1 rounded text-xs ${

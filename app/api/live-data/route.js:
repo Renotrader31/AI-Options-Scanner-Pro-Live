@@ -250,52 +250,112 @@ async function fetchFromFMP(symbols) {
   }));
 }
 
-// Finnhub API implementation - Free tier with real-time data
-async function fetchFromFinnhub(symbols) {
+// FMP API implementation - PAID ACCOUNT OPTIMIZED
+async function fetchFromFMP(symbols) {
+  const apiKey = API_KEYS.FMP;
+  
+  // Skip demo/invalid keys
+  if (!apiKey || apiKey === 'demo') {
+    throw new Error('FMP API key not configured - skipping FMP');
+  }
+  
   try {
-    const promises = symbols.map(async (symbol) => {
-      const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=sandbox_c7q22r2ad3idnlgrni40`;
-      
-      const response = await fetch(url, {
-        timeout: 8000
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Finnhub API error for ${symbol}: ${response.status}`);
+    console.log(`🔑 Using PAID FMP API key: ${apiKey.substring(0, 8)}...`);
+    
+    // For paid accounts, use bulk quote endpoint for efficiency
+    const symbolList = symbols.join(',');
+    const url = `https://financialmodelingprep.com/api/v3/quote/${symbolList}?apikey=${apiKey}`;
+    
+    console.log(`🔗 FMP PAID URL: https://financialmodelingprep.com/api/v3/quote/${symbolList}?apikey=[HIDDEN]`);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; ScannerProAI/2.0)',
+        'Accept': 'application/json',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive'
       }
-      
-      const data = await response.json();
-      
-      if (!data.c || data.c === 0) {
-        throw new Error(`No data for ${symbol} from Finnhub`);
-      }
-      
-      const currentPrice = data.c; // Current price
-      const previousClose = data.pc; // Previous close
-      const change = currentPrice - previousClose;
-      const changePercent = (change / previousClose) * 100;
-      
-      return {
-        symbol: symbol,
-        price: Math.round(currentPrice * 100) / 100,
-        change: Math.round(change * 100) / 100,
-        changePercent: Math.round(changePercent * 100) / 100,
-        volume: 0, // Finnhub free tier doesn't include volume in quote endpoint
-        avgVolume: 0,
-        marketCap: 0,
-        high: data.h || currentPrice, // Day high
-        low: data.l || currentPrice, // Day low
-        open: data.o || currentPrice, // Open price
-        previousClose: previousClose
-      };
     });
     
-    const results = await Promise.all(promises);
-    console.log(`✅ Finnhub: Got ${results.length} real-time prices`);
-    return results.filter(r => r !== null);
+    console.log(`📊 FMP PAID Response: ${response.status} ${response.statusText}`);
+    console.log(`📊 FMP Headers:`, Object.fromEntries(response.headers.entries()));
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ FMP PAID Error Response: ${errorText}`);
+      
+      // Check for specific FMP error codes
+      if (response.status === 403) {
+        throw new Error('FMP API: Access forbidden - check API key permissions');
+      } else if (response.status === 429) {
+        throw new Error('FMP API: Rate limit exceeded');
+      } else if (response.status === 401) {
+        throw new Error('FMP API: Unauthorized - invalid API key');
+      }
+      
+      throw new Error(`FMP API error: ${response.status} - ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`📊 FMP PAID Raw response (${data.length} items):`, data);
+    
+    // Check for FMP-specific error responses
+    if (data.error || (typeof data === 'object' && data.message)) {
+      console.error('❌ FMP API returned error:', data);
+      throw new Error(`FMP API error: ${data.error || data.message}`);
+    }
+    
+    if (!Array.isArray(data)) {
+      console.error('❌ FMP returned non-array:', typeof data, data);
+      throw new Error(`FMP returned unexpected format: ${typeof data}`);
+    }
+    
+    if (data.length === 0) {
+      console.warn('⚠️ FMP returned empty array for symbols:', symbols);
+      throw new Error('FMP returned no data for requested symbols');
+    }
+    
+    // Process FMP data with enhanced error checking
+    const results = data.map((item, index) => {
+      console.log(`📊 Processing FMP item ${index}:`, item);
+      
+      if (!item.symbol) {
+        console.warn(`⚠️ FMP item missing symbol:`, item);
+        return null;
+      }
+      
+      const price = parseFloat(item.price);
+      if (isNaN(price) || price <= 0) {
+        console.warn(`⚠️ Invalid price for ${item.symbol}: ${item.price}`);
+        return null;
+      }
+      
+      return {
+        symbol: item.symbol,
+        price: Math.round(price * 100) / 100,
+        change: Math.round((parseFloat(item.change) || 0) * 100) / 100,
+        changePercent: Math.round((parseFloat(item.changesPercentage) || 0) * 100) / 100,
+        volume: parseInt(item.volume) || 0,
+        avgVolume: parseInt(item.avgVolume) || 0,
+        marketCap: parseInt(item.marketCap) || 0,
+        high: Math.round((parseFloat(item.dayHigh) || price) * 100) / 100,
+        low: Math.round((parseFloat(item.dayLow) || price) * 100) / 100,
+        open: Math.round((parseFloat(item.open) || price) * 100) / 100,
+        previousClose: Math.round((parseFloat(item.previousClose) || price) * 100) / 100
+      };
+    }).filter(item => item !== null);
+    
+    console.log(`✅ FMP PAID Success: Processed ${results.length}/${data.length} valid items`);
+    
+    if (results.length === 0) {
+      throw new Error('FMP: No valid data after processing');
+    }
+    
+    return results;
     
   } catch (error) {
-    console.error('❌ Finnhub failed:', error.message);
+    console.error('❌ FMP PAID API failed:', error.message);
     throw error;
   }
 }

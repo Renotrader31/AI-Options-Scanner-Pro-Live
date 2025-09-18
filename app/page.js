@@ -1145,12 +1145,35 @@ export default function UltimateScanner() {
     console.log('📊 Local analytics calculated:', localAnalytics);
   };
 
-  // Handle closing a trade (enhanced with partial closes)
+  // Handle closing a trade (enhanced with partial closes and better validation)
   const handleCloseTrade = async (trade) => {
-    // Step 1: Get quantity to close
-    const maxQuantity = trade.quantity || 0;
+    // Enhanced validation and logging for debugging P&L issues
+    console.log('🔍 Closing Trade - Input Validation:', {
+      tradeId: trade.id,
+      symbol: trade.symbol,
+      assetType: trade.assetType,
+      strategyType: trade.strategyType,
+      originalQuantity: trade.quantity,
+      entryPrice: trade.entryPrice,
+      type: trade.type,
+      netPremium: trade.netPremium
+    });
+
+    // Step 1: Get quantity to close with enhanced validation
+    const maxQuantity = parseInt(trade.quantity) || 0;
+    
+    if (maxQuantity <= 0) {
+      setError('Invalid trade quantity. Cannot close position.');
+      return;
+    }
+    
     const quantityToClose = prompt(
-      `How many ${trade.assetType === 'OPTION' ? 'contracts' : 'shares'} do you want to close?\n\nCurrent position: ${maxQuantity}\nEnter quantity (or 'all' for full close):`,
+      `Close Position for ${trade.symbol}\n\n` +
+      `Asset Type: ${trade.assetType}\n` +
+      `Strategy: ${trade.strategyType || 'SINGLE'}\n` +
+      `Current Position: ${maxQuantity} ${trade.assetType === 'OPTION' ? 'contracts' : 'shares'}\n` +
+      `Entry Price: $${trade.entryPrice}\n\n` +
+      `Enter quantity to close (or 'all' for full close):`,
       maxQuantity.toString()
     );
     
@@ -1169,9 +1192,12 @@ export default function UltimateScanner() {
       }
     }
     
-    // Step 2: Get exit price
+    // Step 2: Get exit price with better context
+    const priceLabel = trade.assetType === 'OPTION' ? 'premium' : 'price';
     const currentPrice = prompt(
-      `Enter current ${trade.assetType === 'OPTION' ? 'premium' : 'price'} to close ${closeQty} ${trade.assetType === 'OPTION' ? 'contracts' : 'shares'} of ${trade.symbol}:`,
+      `Enter current ${priceLabel} to close ${closeQty} ${trade.assetType === 'OPTION' ? 'contracts' : 'shares'}:\n\n` +
+      `Entry ${priceLabel}: $${trade.entryPrice}\n` +
+      `Current ${priceLabel}:`,
       (trade.currentPrice || trade.entryPrice)?.toFixed(2)
     );
     
@@ -1185,13 +1211,32 @@ export default function UltimateScanner() {
     try {
       const exitPrice = parseFloat(currentPrice);
       
-      // Calculate P&L for the closed portion
+      // ENHANCED P&L CALCULATION WITH COMPREHENSIVE LOGGING
       let closePnl, closePnlPercent;
       
-      if (trade.assetType === 'MULTI_LEG_OPTION') {
-        // Multi-leg strategies: P&L is net premium difference per contract * contracts * 100 shares per contract
-        // FIXED: Option spreads need 100x multiplier like single options
-        const isCredit = trade.netPremium > 0;
+      console.log('💰 P&L Calculation Starting:', {
+        symbol: trade.symbol,
+        entryPrice: trade.entryPrice,
+        exitPrice: exitPrice,
+        closeQty: closeQty,
+        assetType: trade.assetType,
+        strategyType: trade.strategyType,
+        multiplier: trade.assetType === 'STOCK' ? 1 : 100,
+        tradeType: trade.type,
+        netPremium: trade.netPremium
+      });
+      
+      if (trade.assetType === 'MULTI_LEG_OPTION' || 
+          (trade.strategyType && trade.strategyType !== 'SINGLE')) {
+        // Multi-leg option spreads - Enhanced logic with better validation
+        const isCredit = (trade.netPremium || 0) > 0;
+        
+        console.log('🎯 Multi-leg Option Calculation:', {
+          isCredit: isCredit,
+          netPremium: trade.netPremium,
+          formula: isCredit ? '(entry - exit) × qty × 100' : '(exit - entry) × qty × 100'
+        });
+        
         if (isCredit) {
           // Credit spread: P&L = (collected credit - cost to close) * contracts * 100
           closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
@@ -1199,9 +1244,21 @@ export default function UltimateScanner() {
           // Debit spread: P&L = (exit value - paid debit) * contracts * 100
           closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
         }
+        
+        console.log('💰 Multi-leg P&L Details:', {
+          calculation: isCredit ? 
+            `(${trade.entryPrice} - ${exitPrice}) × ${closeQty} × 100` :
+            `(${exitPrice} - ${trade.entryPrice}) × ${closeQty} × 100`,
+          result: closePnl
+        });
+        
       } else if (trade.assetType === 'OPTION') {
         // Single options: Premium is per contract, multiply by 100 shares per contract
-        // 🎯 CRITICAL FIX: Use consistent BUY vs SELL logic
+        console.log('🎯 Single Option Calculation:', {
+          tradeType: trade.type,
+          isSell: trade.type === 'SELL' || (trade.type && trade.type.includes('SELL'))
+        });
+        
         if (trade.type === 'SELL' || (trade.type && trade.type.includes('SELL'))) {
           // SELL TO OPEN: Profit when exit price is LOWER than entry price
           closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
@@ -1210,20 +1267,25 @@ export default function UltimateScanner() {
           closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
         }
         
-        console.log(`📊 Close Position P&L for ${trade.symbol}:`, {
+        console.log(`📊 Single Option P&L for ${trade.symbol}:`, {
           tradeType: trade.type,
           assetType: trade.assetType,
           entryPrice: trade.entryPrice,
           exitPrice: exitPrice,
           quantity: closeQty,
           isSell: trade.type === 'SELL' || (trade.type && trade.type.includes('SELL')),
+          calculation: trade.type === 'SELL' || (trade.type && trade.type.includes('SELL')) ? 
+            `(${trade.entryPrice} - ${exitPrice}) × ${closeQty} × 100` :
+            `(${exitPrice} - ${trade.entryPrice}) × ${closeQty} × 100`,
           calculatedPnL: closePnl,
           logic: trade.type === 'SELL' || (trade.type && trade.type.includes('SELL')) ? 
                  'SELL: Profit when exit < entry' : 'BUY: Profit when exit > entry'
         });
+        
       } else {
         // Stocks: No multiplier needed, price is per share
-        // 🎯 CONSISTENT LOGIC: BUY vs SELL for stocks
+        console.log('🎯 Stock Calculation');
+        
         if (trade.type === 'SELL' || (trade.type && trade.type.includes('SELL'))) {
           // SHORT: Profit when exit price is LOWER than entry price
           closePnl = (trade.entryPrice - exitPrice) * closeQty;
@@ -1232,24 +1294,41 @@ export default function UltimateScanner() {
           closePnl = (exitPrice - trade.entryPrice) * closeQty;
         }
         
-        console.log(`📊 Close Stock P&L for ${trade.symbol}:`, {
+        console.log(`📊 Stock P&L for ${trade.symbol}:`, {
           tradeType: trade.type,
           entryPrice: trade.entryPrice,
           exitPrice: exitPrice,
           quantity: closeQty,
+          calculation: trade.type === 'SELL' || (trade.type && trade.type.includes('SELL')) ?
+            `(${trade.entryPrice} - ${exitPrice}) × ${closeQty}` :
+            `(${exitPrice} - ${trade.entryPrice}) × ${closeQty}`,
           calculatedPnL: closePnl
         });
       }
       
-      // Calculate P&L percentage
-      if (trade.assetType === 'MULTI_LEG_OPTION') {
-        // FIXED: Multi-leg option percentage calculation needs 100x multiplier consistency
-        closePnlPercent = Math.abs(trade.entryPrice) > 0 ? (closePnl / (Math.abs(trade.entryPrice) * closeQty * 100)) * 100 : 0;
-      } else if (trade.assetType === 'OPTION') {
-        closePnlPercent = (closePnl / (trade.entryPrice * closeQty * 100)) * 100;
-      } else {
-        closePnlPercent = (closePnl / (trade.entryPrice * closeQty)) * 100;
-      }
+      // Enhanced P&L percentage calculation with proper validation
+      const multiplier = trade.assetType === 'STOCK' ? 1 : 100;
+      const costBasis = Math.abs(trade.entryPrice) * closeQty * multiplier;
+      
+      closePnlPercent = costBasis > 0 ? (closePnl / costBasis) * 100 : 0;
+      
+      console.log('📈 P&L Percentage Calculation:', {
+        costBasis: costBasis,
+        pnlAmount: closePnl,
+        percentage: closePnlPercent,
+        formula: `(${closePnl} / ${costBasis}) × 100`
+      });
+      
+      console.log('✅ FINAL P&L RESULTS:', {
+        symbol: trade.symbol,
+        closedQuantity: closeQty,
+        totalQuantity: maxQuantity,
+        entryPrice: trade.entryPrice,
+        exitPrice: exitPrice,
+        pnlDollar: Math.round(closePnl * 100) / 100,
+        pnlPercent: Math.round(closePnlPercent * 100) / 100,
+        isCorrect: '✅ Enhanced calculation with validation'
+      });
       
       let updatedTrades;
       

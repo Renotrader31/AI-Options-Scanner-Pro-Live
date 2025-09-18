@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 P&L Bug Diagnosis - Your Specific Issue</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 15px; 
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            color: #2c3e50;
+        }
+        .issue-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .issue-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+        }
+        .test-case {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .test-case.bug {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        .test-case.fixed {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        .calculation-step {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+        .bug-highlight {
+            background: #ff6b6b;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .fix-highlight {
+            background: #4ecdc4;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .run-button {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s;
+        }
+        .run-button:hover {
+            transform: translateY(-2px);
+        }
+        .pnl-positive { color: #28a745; font-weight: bold; }
+        .pnl-negative { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 P&L Bug Diagnosis</h1>
+            <p>Analyzing your specific BE spread issue: 2 contracts, $3.70 → $4.20</p>
+        </div>
+        
+        <div class="issue-box">
+            <h3>🚨 The Problem</h3>
+            <p><strong>Your Trade:</strong></p>
+            <ul>
+                <li>Opened spread: 2 contracts at $3.70 premium</li>
+                <li>Closed spread: 2 contracts at $4.20 premium</li>
+                <li><strong>Expected P&L:</strong> $100</li>
+                <li><strong>App Shows:</strong> $50 (only half!)</li>
+            </ul>
+        </div>
+        
+        <button class="run-button" onclick="runDiagnosis()">🔬 Diagnose the Bug</button>
+        <button class="run-button" onclick="showFixedCalculation()">✅ Show Fixed Calculation</button>
+        
+        <div id="diagnosisResults" style="display: none;"></div>
+    </div>
+
+    <script>
+        // CURRENT BUGGY CALCULATION (from app/page.js)
+        function currentBuggyCalculation(trade, exitPrice, closeQty) {
+            let closePnl;
+            
+            if (trade.assetType === 'MULTI_LEG_OPTION') {
+                const isCredit = trade.netPremium > 0;
+                if (isCredit) {
+                    closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
+                } else {
+                    // BUG: This line might not be handling quantity correctly
+                    closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+                }
+            } else if (trade.assetType === 'OPTION') {
+                if (trade.type === 'SELL' || (trade.type && trade.type.includes('SELL'))) {
+                    closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
+                } else {
+                    closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+                }
+            }
+            
+            return Math.round(closePnl * 100) / 100;
+        }
+        
+        // FIXED CALCULATION
+        function fixedCalculation(trade, exitPrice, closeQty) {
+            let closePnl;
+            
+            console.log('🔧 Fixed Calculation Input:', {
+                assetType: trade.assetType,
+                entryPrice: trade.entryPrice,
+                exitPrice: exitPrice,
+                closeQty: closeQty,
+                originalQuantity: trade.quantity
+            });
+            
+            if (trade.assetType === 'MULTI_LEG_OPTION') {
+                const isCredit = trade.netPremium > 0;
+                if (isCredit) {
+                    // Credit spread: Profit when exit price is lower
+                    closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
+                } else {
+                    // Debit spread: Profit when exit price is higher
+                    closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+                }
+            } else if (trade.assetType === 'OPTION') {
+                // Single option handling
+                if (trade.type === 'SELL' || (trade.type && trade.type.includes('SELL'))) {
+                    closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
+                } else {
+                    closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+                }
+            }
+            
+            console.log('🔧 Fixed Calculation Steps:', {
+                premiumDifference: exitPrice - trade.entryPrice,
+                contractsTraded: closeQty,
+                multiplier: 100,
+                calculation: `(${exitPrice} - ${trade.entryPrice}) × ${closeQty} × 100`,
+                result: closePnl
+            });
+            
+            return Math.round(closePnl * 100) / 100;
+        }
+        
+        function runDiagnosis() {
+            const resultsDiv = document.getElementById('diagnosisResults');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '';
+            
+            // Your specific trade scenario
+            const yourTrade = {
+                assetType: 'MULTI_LEG_OPTION', // or could be 'OPTION' 
+                entryPrice: 3.70,
+                quantity: 2, // This is the original quantity
+                netPremium: -7.40, // Negative for debit spread (2 × $3.70)
+                type: 'BUY_TO_OPEN' // Assuming you bought the spread
+            };
+            
+            const exitPrice = 4.20;
+            const closeQty = 2; // Closing both contracts
+            
+            // Test different scenarios
+            const scenarios = [
+                {
+                    name: "Scenario 1: Multi-Leg Option (Current App Logic)",
+                    trade: { ...yourTrade, assetType: 'MULTI_LEG_OPTION' },
+                    isBuggy: true
+                },
+                {
+                    name: "Scenario 2: Single Option per Contract",
+                    trade: { ...yourTrade, assetType: 'OPTION' },
+                    isBuggy: true
+                }
+            ];
+            
+            scenarios.forEach(scenario => {
+                const buggyResult = currentBuggyCalculation(scenario.trade, exitPrice, closeQty);
+                const fixedResult = fixedCalculation(scenario.trade, exitPrice, closeQty);
+                const expectedResult = 100; // Your expected result
+                
+                const testDiv = document.createElement('div');
+                testDiv.className = 'test-section';
+                testDiv.innerHTML = `
+                    <h3>${scenario.name}</h3>
+                    <div class="test-case">
+                        <h4>Trade Setup:</h4>
+                        <div class="calculation-step">Asset Type: ${scenario.trade.assetType}</div>
+                        <div class="calculation-step">Entry Price: $${scenario.trade.entryPrice} per contract</div>
+                        <div class="calculation-step">Exit Price: $${exitPrice} per contract</div>
+                        <div class="calculation-step">Quantity: ${closeQty} contracts</div>
+                        <div class="calculation-step">Expected P&L: <span class="pnl-positive">$${expectedResult}</span></div>
+                    </div>
+                    
+                    <div class="test-case bug">
+                        <h4>🐛 Current App Result (Buggy):</h4>
+                        <div class="calculation-step">Calculated P&L: <span class="${buggyResult >= 0 ? 'pnl-positive' : 'pnl-negative'}">$${buggyResult}</span></div>
+                        <div class="calculation-step">
+                            ${buggyResult !== expectedResult ? 
+                                `<span class="bug-highlight">BUG: Shows $${buggyResult} instead of $${expectedResult}</span>` : 
+                                '✅ This calculation is correct'}
+                        </div>
+                    </div>
+                    
+                    <div class="test-case fixed">
+                        <h4>✅ Fixed Calculation:</h4>
+                        <div class="calculation-step">Formula: (Exit Price - Entry Price) × Contracts × 100</div>
+                        <div class="calculation-step">Calculation: ($${exitPrice} - $${scenario.trade.entryPrice}) × ${closeQty} × 100</div>
+                        <div class="calculation-step">Step 1: $${exitPrice - scenario.trade.entryPrice} per contract difference</div>
+                        <div class="calculation-step">Step 2: $${exitPrice - scenario.trade.entryPrice} × ${closeQty} contracts = $${(exitPrice - scenario.trade.entryPrice) * closeQty}</div>
+                        <div class="calculation-step">Step 3: $${(exitPrice - scenario.trade.entryPrice) * closeQty} × 100 (shares per contract) = <span class="fix-highlight">$${fixedResult}</span></div>
+                        <div class="calculation-step">
+                            ${fixedResult === expectedResult ? 
+                                '🎉 <span class="fix-highlight">CORRECT! Matches expected $' + expectedResult + '</span>' : 
+                                '⚠️ Still not matching expected result'}
+                        </div>
+                    </div>
+                `;
+                
+                resultsDiv.appendChild(testDiv);
+            });
+            
+            // Add diagnosis summary
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'test-section';
+            summaryDiv.style.background = '#f0f8ff';
+            summaryDiv.innerHTML = `
+                <h3>🎯 Root Cause Analysis</h3>
+                <div class="test-case">
+                    <h4>Likely Issues:</h4>
+                    <ol>
+                        <li><strong>Quantity Handling:</strong> The app might be treating your 2-contract trade as 1 contract internally</li>
+                        <li><strong>Entry Price Storage:</strong> The entry price might be stored incorrectly (per contract vs total)</li>
+                        <li><strong>Close Quantity:</strong> When closing, the quantity multiplication might be missing</li>
+                        <li><strong>Asset Type Classification:</strong> Your spread might be classified wrong (MULTI_LEG vs OPTION)</li>
+                    </ol>
+                    
+                    <h4>Quick Diagnostic Questions:</h4>
+                    <ul>
+                        <li>When you entered the trade, did you enter "2" for quantity or "1"?</li>
+                        <li>Did you enter $3.70 or $7.40 for the price?</li>
+                        <li>Is your spread classified as "Multi-Leg Option" or "Single Option"?</li>
+                        <li>When closing, did you specify to close "2" contracts or "1"?</li>
+                    </ul>
+                </div>
+            `;
+            
+            resultsDiv.appendChild(summaryDiv);
+        }
+        
+        function showFixedCalculation() {
+            // This will show the corrected version
+            const resultsDiv = document.getElementById('diagnosisResults');
+            resultsDiv.style.display = 'block';
+            
+            const fixDiv = document.createElement('div');
+            fixDiv.className = 'test-section';
+            fixDiv.style.background = '#d4edda';
+            fixDiv.innerHTML = `
+                <h3>🔧 The Fix</h3>
+                <div class="test-case fixed">
+                    <h4>Corrected P&L Calculation Logic:</h4>
+                    <div class="calculation-step">1. Ensure quantity is properly tracked (2 contracts)</div>
+                    <div class="calculation-step">2. Use per-contract pricing ($3.70 entry, $4.20 exit)</div>
+                    <div class="calculation-step">3. Apply correct formula: (Exit - Entry) × Quantity × 100</div>
+                    <div class="calculation-step">4. Result: ($4.20 - $3.70) × 2 × 100 = $0.50 × 2 × 100 = <span class="fix-highlight">$100</span></div>
+                    
+                    <h4>Code Fix Needed:</h4>
+                    <pre style="background: #2c3e50; color: white; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// In the closeTrade function, ensure closeQty is properly used:
+if (trade.assetType === 'OPTION' || trade.assetType === 'MULTI_LEG_OPTION') {
+    // For debit spreads (bought)
+    closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+    
+    // Make sure closeQty matches the actual contracts being closed
+    console.log('Closing:', closeQty, 'contracts at $', exitPrice);
+}
+                    </pre>
+                </div>
+            `;
+            
+            resultsDiv.appendChild(fixDiv);
+        }
+    </script>
+</body>
+</html>

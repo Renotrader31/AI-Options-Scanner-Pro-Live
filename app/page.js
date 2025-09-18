@@ -1201,18 +1201,44 @@ export default function UltimateScanner() {
         }
       } else if (trade.assetType === 'OPTION') {
         // Single options: Premium is per contract, multiply by 100 shares per contract
-        if (trade.type && (trade.type === 'BUY' || trade.type === 'BUY_TO_OPEN')) {
-          closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
-        } else {
+        // 🎯 CRITICAL FIX: Use consistent BUY vs SELL logic
+        if (trade.type === 'SELL' || (trade.type && trade.type.includes('SELL'))) {
+          // SELL TO OPEN: Profit when exit price is LOWER than entry price
           closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
+        } else {
+          // BUY TO OPEN: Profit when exit price is HIGHER than entry price  
+          closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
         }
+        
+        console.log(`📊 Close Position P&L for ${trade.symbol}:`, {
+          tradeType: trade.type,
+          assetType: trade.assetType,
+          entryPrice: trade.entryPrice,
+          exitPrice: exitPrice,
+          quantity: closeQty,
+          isSell: trade.type === 'SELL' || (trade.type && trade.type.includes('SELL')),
+          calculatedPnL: closePnl,
+          logic: trade.type === 'SELL' || (trade.type && trade.type.includes('SELL')) ? 
+                 'SELL: Profit when exit < entry' : 'BUY: Profit when exit > entry'
+        });
       } else {
         // Stocks: No multiplier needed, price is per share
-        if (trade.type && trade.type === 'BUY') {
-          closePnl = (exitPrice - trade.entryPrice) * closeQty;
-        } else {
+        // 🎯 CONSISTENT LOGIC: BUY vs SELL for stocks
+        if (trade.type === 'SELL' || (trade.type && trade.type.includes('SELL'))) {
+          // SHORT: Profit when exit price is LOWER than entry price
           closePnl = (trade.entryPrice - exitPrice) * closeQty;
+        } else {
+          // LONG: Profit when exit price is HIGHER than entry price
+          closePnl = (exitPrice - trade.entryPrice) * closeQty;
         }
+        
+        console.log(`📊 Close Stock P&L for ${trade.symbol}:`, {
+          tradeType: trade.type,
+          entryPrice: trade.entryPrice,
+          exitPrice: exitPrice,
+          quantity: closeQty,
+          calculatedPnL: closePnl
+        });
       }
       
       // Calculate P&L percentage
@@ -2928,7 +2954,7 @@ export default function UltimateScanner() {
                     </div>
                     
                     <button
-                      onClick={() => fetchTrades(null, true)}
+                      onClick={updateLivePortfolioPrices}
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
                       disabled={loading}
                     >

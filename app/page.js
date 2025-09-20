@@ -1220,10 +1220,7 @@ export default function UltimateScanner() {
         exitPrice: exitPrice,
         closeQty: closeQty,
         assetType: trade.assetType,
-        strategyType: trade.strategyType,
-        multiplier: trade.assetType === 'STOCK' ? 1 : 100,
-        tradeType: trade.type,
-        netPremium: trade.netPremium
+        tradeType: trade.type
       });
       
       if (trade.assetType === 'MULTI_LEG_OPTION' || 
@@ -1265,6 +1262,11 @@ export default function UltimateScanner() {
         } else {
           // BUY TO OPEN: Profit when exit price is HIGHER than entry price  
           closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+          
+          console.log('📊 Single Option P&L Calculation:', {
+            calculation: `(${exitPrice} - ${trade.entryPrice}) × ${closeQty} × 100 = ${closePnl}`,
+            result: closePnl
+          });
         }
         
         console.log(`📊 Single Option P&L for ${trade.symbol}:`, {
@@ -1319,15 +1321,17 @@ export default function UltimateScanner() {
         formula: `(${closePnl} / ${costBasis}) × 100`
       });
       
+      // CRITICAL: Final validation before using closePnl
+      const finalPnL = Math.round(closePnl * 100) / 100;
+      const finalPnLPercent = Math.round(closePnlPercent * 100) / 100;
+      
       console.log('✅ FINAL P&L RESULTS:', {
         symbol: trade.symbol,
         closedQuantity: closeQty,
-        totalQuantity: maxQuantity,
         entryPrice: trade.entryPrice,
         exitPrice: exitPrice,
-        pnlDollar: Math.round(closePnl * 100) / 100,
-        pnlPercent: Math.round(closePnlPercent * 100) / 100,
-        isCorrect: '✅ Enhanced calculation with validation'
+        finalPnL: finalPnL,
+        finalPnLPercent: finalPnLPercent
       });
       
       let updatedTrades;
@@ -1339,13 +1343,14 @@ export default function UltimateScanner() {
           status: 'closed',
           exitPrice: exitPrice,
           exitDate: new Date().toISOString(),
-          pnl: Math.round(closePnl * 100) / 100,
-          pnlPercent: Math.round(closePnlPercent * 100) / 100
+          pnl: finalPnL,
+          pnlPercent: finalPnLPercent
         };
         updatedTrades = trades.map(t => t.id === trade.id ? updatedTrade : t);
         
       } else {
         // Partial close - create closed trade record + update remaining position
+        // Create closed trade record with calculated P&L
         const closedTrade = {
           ...trade,
           id: `${trade.id}_close_${Date.now()}`, // New ID for closed portion
@@ -1353,10 +1358,21 @@ export default function UltimateScanner() {
           status: 'closed',
           exitPrice: exitPrice,
           exitDate: new Date().toISOString(),
-          pnl: Math.round(closePnl * 100) / 100,
-          pnlPercent: Math.round(closePnlPercent * 100) / 100,
+          pnl: finalPnL, // Calculated P&L (e.g., -190 for NBIS case)
+          pnlPercent: finalPnLPercent,
           notes: `Partial close of ${trade.id} (${closeQty}/${maxQuantity})` + (trade.notes ? ` | ${trade.notes}` : '')
         };
+        
+        // Ensure calculated P&L is preserved
+        closedTrade.pnl = finalPnL;
+        closedTrade.pnlPercent = finalPnLPercent;
+        
+        console.log('💾 Partial Close - Trade Created:', {
+          symbol: closedTrade.symbol,
+          quantity: closedTrade.quantity,
+          pnl: closedTrade.pnl,
+          status: closedTrade.status
+        });
         
         const remainingTrade = {
           ...trade,
@@ -1377,8 +1393,10 @@ export default function UltimateScanner() {
       }
       
       const closedPortion = closeQty === maxQuantity ? 'Full position' : `${closeQty}/${maxQuantity} ${trade.assetType === 'OPTION' ? 'contracts' : 'shares'}`;
+
+      
       setSuccessMessage(
-        `✅ ${closedPortion} closed! P&L: $${Math.round(closePnl * 100) / 100} (${Math.round(closePnlPercent * 100) / 100}%)${closeQty < maxQuantity ? ` | ${maxQuantity - closeQty} remaining` : ''}`
+        `✅ ${closedPortion} closed! P&L: $${finalPnL} (${finalPnLPercent}%)${closeQty < maxQuantity ? ` | ${maxQuantity - closeQty} remaining` : ''}`
       );
       
       // Refresh analytics

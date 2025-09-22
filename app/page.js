@@ -3024,7 +3024,7 @@ export default function UltimateScanner() {
                   • Trades persist between browser sessions • Data stays on this device • Clear browser data to reset
                 </div>
                 {trades.length > 0 && (
-                  <div className="mt-2">
+                  <div className="mt-2 flex gap-2">
                     <button
                       onClick={() => {
                         if (confirm('Are you sure you want to clear all trade data? This cannot be undone.')) {
@@ -3038,6 +3038,30 @@ export default function UltimateScanner() {
                       className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
                     >
                       Clear All Data ({trades.length} trades)
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Force refresh of trade data and recalculate
+                        const currentTrades = JSON.parse(localStorage.getItem('scannerProTrades') || '[]');
+                        setTrades([...currentTrades]); // Force re-render
+                        calculateLocalAnalytics(currentTrades);
+                        setSuccessMessage('🔄 Trade data refreshed');
+                        console.log('🔄 Force refreshed trade data:', currentTrades);
+                      }}
+                      className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                    >
+                      Force Refresh Data
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Debug: Show all trades in console
+                        console.log('🔍 Debug: All current trades:', trades);
+                        console.log('🔍 Debug: LocalStorage data:', JSON.parse(localStorage.getItem('scannerProTrades') || '[]'));
+                        setSuccessMessage('📊 Trade data logged to console - open browser dev tools');
+                      }}
+                      className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded"
+                    >
+                      Debug Trades
                     </button>
                   </div>
                 )}
@@ -3202,7 +3226,7 @@ export default function UltimateScanner() {
                           {/* Single Option Display */}
                           {trade.assetType === 'OPTION' && (
                             <div className="text-xs text-slate-400">
-                              {trade.optionType} ${trade.strikePrice} {new Date(trade.expirationDate).toLocaleDateString()}
+                              {trade.optionType} ${trade.strikePrice} {trade.expirationDate}
                             </div>
                           )}
                           
@@ -3219,7 +3243,7 @@ export default function UltimateScanner() {
                                 </div>
                               ))}
                               <div className="text-xs text-slate-500">
-                                Net: ${trade.netPremium} | Exp: {new Date(trade.legs[0]?.expirationDate).toLocaleDateString()}
+                                Net: ${trade.netPremium} | Exp: {trade.legs[0]?.expirationDate}
                               </div>
                             </div>
                           )}
@@ -3242,11 +3266,24 @@ export default function UltimateScanner() {
                         <td className="py-2 text-right">${trade.entryPrice?.toFixed(2)}</td>
                         <td className="py-2 text-right">
                           <div className="flex flex-col items-end">
-                            <span className={trade.liveCurrentPrice ? 'text-blue-400 font-medium' : ''}>
-                              ${(trade.liveCurrentPrice || trade.currentPrice || trade.exitPrice || trade.entryPrice)?.toFixed(2)}
-                            </span>
-                            {trade.liveCurrentPrice && (
-                              <span className="text-xs text-green-400">🔴 Live</span>
+                            {trade.status === 'closed' ? (
+                              // For closed trades, show exit price prominently
+                              <>
+                                <span className="text-orange-400 font-medium">
+                                  ${trade.exitPrice?.toFixed(2) || trade.entryPrice?.toFixed(2)}
+                                </span>
+                                <span className="text-xs text-orange-300">Exit Price</span>
+                              </>
+                            ) : (
+                              // For active trades, show live/current price
+                              <>
+                                <span className={trade.liveCurrentPrice ? 'text-blue-400 font-medium' : ''}>
+                                  ${(trade.liveCurrentPrice || trade.currentPrice || trade.entryPrice)?.toFixed(2)}
+                                </span>
+                                {trade.liveCurrentPrice && (
+                                  <span className="text-xs text-green-400">🔴 Live</span>
+                                )}
+                              </>
                             )}
                           </div>
                         </td>

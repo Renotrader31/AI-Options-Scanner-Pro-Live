@@ -955,7 +955,10 @@ export default function UltimateScanner() {
 
       // 🛡️ ML-SAFE: Update trades with live prices WITHOUT affecting original ML data
       const updatedTrades = trades.map(trade => {
-        if (trade.status !== 'active') return trade;
+        if (trade.status !== 'active') {
+          console.log(`⚠️ Skipping live P&L for CLOSED trade: ${trade.symbol} (Status: ${trade.status})`);
+          return trade;
+        }
         
         let livePrice = 0;
         let livePnl = 0;
@@ -3288,21 +3291,40 @@ export default function UltimateScanner() {
                           </div>
                         </td>
                         <td className={`py-2 text-right font-medium ${
-                          (trade.livePnl ?? trade.pnl ?? 0) > 0 ? 'text-green-400' : (trade.livePnl ?? trade.pnl ?? 0) < 0 ? 'text-red-400' : 'text-slate-400'
+                          trade.status === 'closed' ? 
+                            // For CLOSED trades, only use static P&L
+                            ((trade.pnl ?? 0) > 0 ? 'text-green-400' : (trade.pnl ?? 0) < 0 ? 'text-red-400' : 'text-slate-400') :
+                            // For ACTIVE trades, use live P&L if available
+                            ((trade.livePnl ?? trade.pnl ?? 0) > 0 ? 'text-green-400' : (trade.livePnl ?? trade.pnl ?? 0) < 0 ? 'text-red-400' : 'text-slate-400')
                         }`}>
                           <div className="flex flex-col items-end">
-                            <span>${(trade.livePnl ?? trade.pnl ?? 0)?.toFixed(2)}</span>
-                            {trade.livePnl !== undefined && trade.livePnl !== trade.pnl && (
-                              <span className="text-xs text-slate-500">
-                                Static: ${trade.pnl?.toFixed(2) || '0.00'}
-                              </span>
+                            {trade.status === 'closed' ? (
+                              // CLOSED: Show only static P&L (final/correct P&L)
+                              <span>${trade.pnl?.toFixed(2) || '0.00'}</span>
+                            ) : (
+                              // ACTIVE: Show live P&L with static fallback
+                              <>
+                                <span>${(trade.livePnl ?? trade.pnl ?? 0)?.toFixed(2)}</span>
+                                {trade.livePnl !== undefined && trade.livePnl !== trade.pnl && (
+                                  <span className="text-xs text-slate-500">
+                                    Static: ${trade.pnl?.toFixed(2) || '0.00'}
+                                  </span>
+                                )}
+                              </>
                             )}
                           </div>
                         </td>
                         <td className={`py-2 text-right font-medium ${
-                          (trade.livePnlPercent ?? trade.pnlPercent ?? 0) > 0 ? 'text-green-400' : (trade.livePnlPercent ?? trade.pnlPercent ?? 0) < 0 ? 'text-red-400' : 'text-slate-400'
+                          trade.status === 'closed' ? 
+                            // For CLOSED trades, only use static P&L %
+                            ((trade.pnlPercent ?? 0) > 0 ? 'text-green-400' : (trade.pnlPercent ?? 0) < 0 ? 'text-red-400' : 'text-slate-400') :
+                            // For ACTIVE trades, use live P&L % if available
+                            ((trade.livePnlPercent ?? trade.pnlPercent ?? 0) > 0 ? 'text-green-400' : (trade.livePnlPercent ?? trade.pnlPercent ?? 0) < 0 ? 'text-red-400' : 'text-slate-400')
                         }`}>
-                          {(trade.livePnlPercent ?? trade.pnlPercent ?? 0)?.toFixed(2)}%
+                          {trade.status === 'closed' ? 
+                            (trade.pnlPercent?.toFixed(2) || '0.00') : 
+                            (trade.livePnlPercent ?? trade.pnlPercent ?? 0)?.toFixed(2)
+                          }%
                         </td>
                         <td className="py-2">
                           <span className={`px-2 py-1 rounded text-xs ${

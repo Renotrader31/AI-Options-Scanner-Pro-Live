@@ -767,6 +767,12 @@ export default function UltimateScanner() {
           }
         }
         
+        // ✅ FALLBACK 3: For spreads, if no premium specified, use calculated net premium
+        if (entryPrice === 0 && Math.abs(netPremium) > 0) {
+          entryPrice = Math.abs(netPremium);
+          console.log('🔄 Using calculated net premium as entry price:', entryPrice);
+        }
+        
         console.log('🔍 ENHANCED Multi-leg Calculation:', {
           totalCost,
           totalCredit,
@@ -1346,6 +1352,17 @@ export default function UltimateScanner() {
           pnl: finalPnL,
           pnlPercent: finalPnLPercent
         };
+        
+        console.log('💾 Full Close - Trade Updated:', {
+          symbol: updatedTrade.symbol,
+          quantity: updatedTrade.quantity,
+          entryPrice: updatedTrade.entryPrice,
+          exitPrice: updatedTrade.exitPrice,
+          pnl: updatedTrade.pnl,
+          pnlPercent: updatedTrade.pnlPercent,
+          status: updatedTrade.status
+        });
+        
         updatedTrades = trades.map(t => t.id === trade.id ? updatedTrade : t);
         
       } else {
@@ -1370,7 +1387,10 @@ export default function UltimateScanner() {
         console.log('💾 Partial Close - Trade Created:', {
           symbol: closedTrade.symbol,
           quantity: closedTrade.quantity,
+          entryPrice: closedTrade.entryPrice,
+          exitPrice: closedTrade.exitPrice,
           pnl: closedTrade.pnl,
+          pnlPercent: closedTrade.pnlPercent,
           status: closedTrade.status
         });
         
@@ -1540,10 +1560,10 @@ export default function UltimateScanner() {
       ATM: atm, ITM: itm, OTM: otm, FarITM: farItm, FarOTM: farOtm, increment: strikeIncrement
     });
 
-    // Generate expiration dates
-    const nearExpiry = new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString();
-    const midExpiry = new Date(Date.now() + 21*24*60*60*1000).toLocaleDateString();
-    const farExpiry = new Date(Date.now() + 45*24*60*60*1000).toLocaleDateString();
+    // Generate expiration dates in ISO format to avoid timezone issues
+    const nearExpiry = new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
+    const midExpiry = new Date(Date.now() + 21*24*60*60*1000).toISOString().split('T')[0];
+    const farExpiry = new Date(Date.now() + 45*24*60*60*1000).toISOString().split('T')[0];
 
     // 1. LONG CALL - Basic bullish strategy
     const longCallPremium = Math.max(2, basePrice * 0.01); // Realistic premium: $2 minimum or 1% of stock price

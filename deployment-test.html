@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deployment Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f8ff; }
+        .test-box { background: white; padding: 20px; border-radius: 10px; margin: 10px 0; }
+        .success { border-left: 5px solid #4CAF50; }
+        .error { border-left: 5px solid #f44336; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Deployment Test - Fix Verification</h1>
+    
+    <div class="test-box success">
+        <h3>✅ Critical Fixes Applied</h3>
+        <p><strong>Timestamp:</strong> September 23, 2024 - 3:15 PM</p>
+        <p><strong>Commit Hash:</strong> c1b3fe3</p>
+        <ul>
+            <li>✅ Expiration Date Display Fixed</li>
+            <li>✅ Current Price Logic Fixed</li>
+            <li>✅ P&L Display Logic Fixed</li>
+            <li>✅ Multi-leg Spread Quantity Bug Fixed</li>
+        </ul>
+    </div>
+    
+    <div class="test-box">
+        <h3>🎯 Test Instructions</h3>
+        <p>If you can see this page at your live URL, then the deployment IS working and pulling from GitHub.</p>
+        <p>If you see this page, but the main app still shows old behavior, then there might be a caching issue.</p>
+    </div>
+    
+    <div class="test-box">
+        <h3>📊 Expected Behavior After Fixes</h3>
+        <ul>
+            <li><strong>NBIS Trade:</strong> Should show Current Price as $8.70 (orange, from exitPrice)</li>
+            <li><strong>NVDA Trades:</strong> Should show correct P&L (+$138/-$91)</li>
+            <li><strong>PLTR Spread:</strong> Should show 2 contracts and full P&L credit</li>
+            <li><strong>Expiration Dates:</strong> Should show raw YYYY-MM-DD format (no timezone offset)</li>
+        </ul>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 Deployment Test Page Loaded');
+            console.log('✅ If you see this in console, the latest code is deployed');
+            console.log('🔄 Try clearing browser cache if main app still shows old behavior');
+        });
+    </script>
+</body>
+</html>

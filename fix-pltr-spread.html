@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix PLTR Spread Quantity Issue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1e293b;
+            color: white;
+        }
+        .fix-section {
+            background: #374151;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+        }
+        .issue {
+            background: #7f1d1d;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #ef4444;
+        }
+        .solution {
+            background: #064e3b;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #10b981;
+        }
+        .code {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        button.danger { background: #ef4444; }
+        button.danger:hover { background: #dc2626; }
+        .highlight { background: #fbbf24; color: #000; padding: 2px 4px; border-radius: 3px; }
+        #results { background: #111827; padding: 15px; border-radius: 5px; margin-top: 20px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🔧 PLTR Spread Quantity Fix Tool</h1>
+
+    <div class="fix-section">
+        <h2>🚨 Issue Identified: Multi-Leg Spread Quantity Bug</h2>
+        
+        <div class="issue">
+            <h3>❌ The Problem</h3>
+            <p><strong>Root Cause:</strong> Multi-leg spreads were hardcoded to <code>quantity: 1</code> regardless of actual number of spreads traded.</p>
+            
+            <div class="code">
+// BEFORE (Problematic Code):
+quantity: 1,  // ← Always 1, even for 2+ spreads!
+
+// IMPACT ON YOUR PLTR TRADE:
+- You traded: 2 PLTR spreads
+- System recorded: 1 spread  
+- When closing: Only 1 spread worth of P&L calculated
+- Result: Half the profit/loss you should get
+            </div>
+        </div>
+
+        <div class="solution">
+            <h3>✅ The Fix Applied</h3>
+            <div class="code">
+// NEW (Fixed Code):
+const spreadQuantity = parseInt(tradeForm.quantity) || 1;
+quantity: spreadQuantity,  // ← Now uses actual quantity!
+
+// BENEFITS:
+- Properly records number of spreads (1, 2, 3, etc.)
+- P&L calculations use correct quantity
+- Closing positions gives full credit
+- Portfolio totals are accurate
+            </div>
+        </div>
+    </div>
+
+    <div class="fix-section">
+        <h2>🔍 PLTR Spread Analysis Tool</h2>
+        <p>Use these tools to identify and potentially fix your existing PLTR trades:</p>
+
+        <button onclick="analyzeTrades()">📊 Analyze Current PLTR Trades</button>
+        <button onclick="debugLocalStorage()">🔍 Debug LocalStorage Data</button>
+        <button onclick="fixQuantityIssues()">🛠️ Fix Quantity Issues</button>
+        <button onclick="clearAndRestart()" class="danger">🗑️ Clear & Restart Clean</button>
+
+        <div id="results"></div>
+    </div>
+
+    <div class="fix-section">
+        <h2>📝 Manual Fix Instructions</h2>
+        <h3>If you want to manually correct your PLTR spread:</h3>
+        <ol>
+            <li><strong>Note your current P&L</strong> from the PLTR spread</li>
+            <li><strong>Delete the existing PLTR trade</strong> (use red Delete button)</li>
+            <li><strong>Re-enter the spread</strong> with correct details:
+                <ul>
+                    <li>Symbol: PLTR</li>
+                    <li><span class="highlight">Quantity: 2</span> (in the main quantity field)</li>
+                    <li>Strategy: Choose appropriate spread type</li>
+                    <li>Fill in all leg details</li>
+                </ul>
+            </li>
+            <li><strong>Close the position</strong> with the correct exit price</li>
+            <li><strong>Verify P&L</strong> is now 2x what it was before</li>
+        </ol>
+    </div>
+
+    <div class="fix-section">
+        <h2>🎯 Expected Results After Fix</h2>
+        <div class="solution">
+            <h3>For 2 PLTR Spreads:</h3>
+            <ul>
+                <li><strong>Entry:</strong> Records as quantity = 2</li>
+                <li><strong>Display:</strong> Shows "2" in quantity column</li>
+                <li><strong>Closing:</strong> Prompts to close 1-2 spreads</li>
+                <li><strong>P&L:</strong> Calculates for full quantity closed</li>
+                <li><strong>Portfolio:</strong> Reflects accurate total P&L</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.textContent += `[${timestamp}] ${message}\n`;
+        }
+
+        function analyzeTrades() {
+            log('🔍 Analyzing PLTR trades...\n');
+            
+            try {
+                const trades = JSON.parse(localStorage.getItem('scannerProTrades') || '[]');
+                const pltrTrades = trades.filter(t => t.symbol === 'PLTR');
+                
+                log(`Found ${pltrTrades.length} PLTR trade(s):`);
+                
+                pltrTrades.forEach((trade, index) => {
+                    log(`\nTRADE ${index + 1}:`);
+                    log(`  Symbol: ${trade.symbol}`);
+                    log(`  Type: ${trade.assetType}`);
+                    log(`  Quantity: ${trade.quantity}`);
+                    log(`  Status: ${trade.status}`);
+                    log(`  Entry Price: $${trade.entryPrice}`);
+                    log(`  P&L: $${trade.pnl || 0}`);
+                    
+                    if (trade.assetType === 'MULTI_LEG_OPTION') {
+                        log(`  Strategy: ${trade.strategyName}`);
+                        log(`  Legs: ${trade.legs?.length || 0}`);
+                        if (trade.legs) {
+                            trade.legs.forEach((leg, legIndex) => {
+                                log(`    Leg ${legIndex + 1}: ${leg.action} ${leg.quantity}x ${leg.optionType} $${leg.strikePrice}`);
+                            });
+                        }
+                        
+                        // Check for quantity issue
+                        if (trade.quantity === 1 && trade.legs?.some(leg => leg.quantity > 1)) {
+                            log(`  ⚠️  POTENTIAL ISSUE: Main quantity is 1 but legs have higher quantities!`);
+                        }
+                    }
+                });
+                
+                if (pltrTrades.length === 0) {
+                    log('No PLTR trades found in localStorage.');
+                }
+                
+            } catch (error) {
+                log(`❌ Error analyzing trades: ${error.message}`);
+            }
+        }
+
+        function debugLocalStorage() {
+            log('🔍 Debugging localStorage data...\n');
+            
+            try {
+                const trades = JSON.parse(localStorage.getItem('scannerProTrades') || '[]');
+                log(`Total trades in localStorage: ${trades.length}`);
+                log(`Raw data preview:`);
+                log(JSON.stringify(trades.slice(0, 2), null, 2));
+                
+            } catch (error) {
+                log(`❌ Error reading localStorage: ${error.message}`);
+            }
+        }
+
+        function fixQuantityIssues() {
+            log('🛠️  Attempting to fix quantity issues...\n');
+            
+            try {
+                const trades = JSON.parse(localStorage.getItem('scannerProTrades') || '[]');
+                let fixedCount = 0;
+                
+                const fixedTrades = trades.map(trade => {
+                    if (trade.assetType === 'MULTI_LEG_OPTION' && trade.quantity === 1) {
+                        // Check if legs suggest multiple contracts
+                        const maxLegQuantity = Math.max(...(trade.legs?.map(leg => leg.quantity) || [1]));
+                        
+                        if (maxLegQuantity > 1) {
+                            log(`Fixing ${trade.symbol} - changing quantity from 1 to ${maxLegQuantity}`);
+                            fixedCount++;
+                            return { ...trade, quantity: maxLegQuantity };
+                        }
+                    }
+                    return trade;
+                });
+                
+                if (fixedCount > 0) {
+                    localStorage.setItem('scannerProTrades', JSON.stringify(fixedTrades));
+                    log(`✅ Fixed ${fixedCount} trade(s). Refresh the main app to see changes.`);
+                } else {
+                    log('No quantity issues found to fix.');
+                }
+                
+            } catch (error) {
+                log(`❌ Error fixing quantities: ${error.message}`);
+            }
+        }
+
+        function clearAndRestart() {
+            if (confirm('⚠️  This will delete ALL trade data. Are you sure?')) {
+                localStorage.removeItem('scannerProTrades');
+                localStorage.removeItem('lastPortfolioPriceUpdate');
+                log('🗑️ All trade data cleared. You can now start fresh with the fixed spread logic.');
+            }
+        }
+
+        // Auto-analyze on load
+        window.onload = function() {
+            log('PLTR Spread Quantity Fix Tool Ready\n');
+            log('Click "Analyze Current PLTR Trades" to diagnose issues.\n');
+        };
+    </script>
+</body>
+</html>

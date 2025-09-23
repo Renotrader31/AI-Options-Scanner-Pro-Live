@@ -782,6 +782,16 @@ export default function UltimateScanner() {
           fallbackUsed: entryPrice !== Math.abs(netPremium)
         });
         
+        // 🎯 CRITICAL FIX: Calculate actual spread quantity from main form quantity
+        const spreadQuantity = parseInt(tradeForm.quantity) || 1;
+        
+        console.log('🔍 SPREAD QUANTITY CALCULATION:', {
+          formQuantity: tradeForm.quantity,
+          parsedQuantity: spreadQuantity,
+          legs: tradeForm.legs.length,
+          note: `This represents ${spreadQuantity} complete spread(s)`
+        });
+        
         newTrade = {
           id: Date.now().toString(),
           symbol: tradeForm.symbol,
@@ -789,21 +799,27 @@ export default function UltimateScanner() {
           assetType: 'MULTI_LEG_OPTION',
           strategyType: tradeForm.strategyType,
           strategyName: strategyTemplates[tradeForm.strategyType]?.name || 'Custom Strategy',
-          legs: tradeForm.legs.map((leg, index) => ({
-            legId: `${Date.now()}_${index}`,
-            action: leg.action,
-            optionType: leg.optionType,
-            strikePrice: parseFloat(leg.strikePrice),
-            expirationDate: leg.expirationDate,
-            quantity: parseInt(leg.quantity),
-            entryPremium: parseFloat(leg.premium),
-            currentPremium: parseFloat(leg.premium)
-          })),
+          legs: tradeForm.legs.map((leg, index) => {
+            const legQuantity = parseInt(leg.quantity) || 1;
+            const totalLegQuantity = legQuantity * spreadQuantity; // Each spread multiplies the leg quantity
+            
+            return {
+              legId: `${Date.now()}_${index}`,
+              action: leg.action,
+              optionType: leg.optionType,
+              strikePrice: parseFloat(leg.strikePrice),
+              expirationDate: leg.expirationDate,
+              quantity: legQuantity, // Per spread leg quantity
+              totalQuantity: totalLegQuantity, // Total contracts for this leg
+              entryPremium: parseFloat(leg.premium),
+              currentPremium: parseFloat(leg.premium)
+            };
+          }),
           netPremium: Math.round(netPremium * 100) / 100,
           isCredit: netPremium > 0,
           totalCost: Math.round(totalCost * 100) / 100,
           totalCredit: Math.round(totalCredit * 100) / 100,
-          quantity: 1,
+          quantity: spreadQuantity, // 🎯 FIXED: Use actual spread quantity from form
           entryPrice: Math.round(entryPrice * 100) / 100, // SIMPLIFIED: just the net premium amount
           stopLoss: tradeForm.stopLoss ? parseFloat(tradeForm.stopLoss) : null,
           takeProfit: tradeForm.takeProfit ? parseFloat(tradeForm.takeProfit) : null,
@@ -1240,6 +1256,10 @@ export default function UltimateScanner() {
         console.log('🎯 Multi-leg Option Calculation:', {
           isCredit: isCredit,
           netPremium: trade.netPremium,
+          tradeQuantity: trade.quantity,
+          closeQuantity: closeQty,
+          entryPrice: trade.entryPrice,
+          exitPrice: exitPrice,
           formula: isCredit ? '(entry - exit) × qty × 100' : '(exit - entry) × qty × 100'
         });
         
@@ -3241,7 +3261,7 @@ export default function UltimateScanner() {
                                   <span className={leg.action === 'BUY' ? 'text-green-400' : 'text-red-400'}>
                                     {leg.action}
                                   </span>
-                                  <span>{leg.quantity}x {leg.optionType} ${leg.strikePrice}</span>
+                                  <span>{leg.totalQuantity || leg.quantity}x {leg.optionType} ${leg.strikePrice}</span>
                                   <span className="text-slate-500">@${leg.entryPremium}</span>
                                 </div>
                               ))}

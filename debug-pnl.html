@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P&L Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1e293b;
+            color: white;
+        }
+        .debug-section {
+            background: #374151;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+        }
+        .trade-analysis {
+            background: #111827;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3b82f6;
+        }
+        .correct {
+            border-left-color: #10b981;
+            background-color: #064e3b;
+        }
+        .incorrect {
+            border-left-color: #ef4444;
+            background-color: #7f1d1d;
+        }
+        .calculation {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        .highlight { background: #fbbf24; color: #000; padding: 2px 4px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 NVDA P&L Debug Analysis</h1>
+    
+    <div class="debug-section">
+        <h2>🚨 Critical P&L Issues Identified</h2>
+        
+        <div class="trade-analysis incorrect">
+            <h3>❌ NVDA Trade #1 (Dec 2025-12-19) - WRONG P&L</h3>
+            <div class="calculation">
+Entry Premium: $6.68
+Exit Premium:  $7.37  
+Quantity: 2 contracts
+Trade Type: BUY_TO_OPEN
+
+CORRECT Calculation:
+P&L = (Exit Premium - Entry Premium) × Quantity × 100
+P&L = ($7.37 - $6.68) × 2 × 100
+P&L = $0.69 × 2 × 100 = +$138.00 ✅ PROFIT
+
+DISPLAYED: -$1336.00 ❌ WRONG!
+STATIC:    +$138.00 ✅ CORRECT
+            </div>
+        </div>
+
+        <div class="trade-analysis incorrect">
+            <h3>❌ NVDA Trade #2 (Oct 2025-10-17) - WRONG P&L</h3>
+            <div class="calculation">
+Entry Premium: $5.74
+Exit Premium:  $4.83
+Quantity: 1 contract  
+Trade Type: BUY_TO_OPEN
+
+CORRECT Calculation:
+P&L = (Exit Premium - Entry Premium) × Quantity × 100
+P&L = ($4.83 - $5.74) × 1 × 100
+P&L = -$0.91 × 1 × 100 = -$91.00 ✅ SMALL LOSS
+
+DISPLAYED: -$1148.00 ❌ WRONG!
+SHOULD BE: -$91.00 ✅ CORRECT
+            </div>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>🔧 Root Cause & Fix Applied</h2>
+        
+        <h3>🐛 Problem:</h3>
+        <ul>
+            <li><span class="highlight">Live P&L calculations</span> were overriding closed trade P&L</li>
+            <li>Display logic was showing <code>livePnl</code> for closed trades</li>
+            <li>Closed trades should ONLY show their final static P&L</li>
+        </ul>
+
+        <h3>✅ Fix Applied:</h3>
+        <div class="calculation">
+// OLD (Problematic):
+${(trade.livePnl ?? trade.pnl ?? 0)?.toFixed(2)}
+// Shows livePnl for ALL trades, including closed ones
+
+// NEW (Fixed):
+{trade.status === 'closed' ? (
+  // CLOSED: Show ONLY static P&L (final/correct)
+  <span>${trade.pnl?.toFixed(2) || '0.00'}</span>
+) : (
+  // ACTIVE: Show live P&L with static fallback
+  <span>${(trade.livePnl ?? trade.pnl ?? 0)?.toFixed(2)}</span>
+)}
+        </div>
+
+        <h3>🛡️ Protection Added:</h3>
+        <ul>
+            <li>Closed trades are <span class="highlight">completely excluded</span> from live P&L calculations</li>
+            <li>Only <span class="highlight">active trades</span> get live market data updates</li>
+            <li>Closed trades display <span class="highlight">ONLY their final static P&L</span></li>
+        </ul>
+    </div>
+
+    <div class="debug-section">
+        <h2>📊 Expected Results After Fix</h2>
+        
+        <div class="trade-analysis correct">
+            <h3>✅ NVDA Dec Trade - Should Show</h3>
+            <p><strong>P&L:</strong> <span style="color: #10b981;">+$138.00</span> (GREEN - PROFIT)</p>
+            <p><strong>%:</strong> <span style="color: #10b981;">+10.34%</span></p>
+            <p><strong>No "Static" label</strong> - just the correct final P&L</p>
+        </div>
+
+        <div class="trade-analysis correct">
+            <h3>✅ NVDA Oct Trade - Should Show</h3>
+            <p><strong>P&L:</strong> <span style="color: #ef4444;">-$91.00</span> (RED - LOSS)</p>
+            <p><strong>%:</strong> <span style="color: #ef4444;">-15.85%</span></p>
+            <p><strong>No "Static" label</strong> - just the correct final P&L</p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <button onclick="testApp()">🚀 Test Fixed App</button>
+        <button onclick="showSteps()">📋 Verification Steps</button>
+        <button onclick="clearData()">🗑️ Clear & Refresh Data</button>
+    </div>
+
+    <div id="steps" style="display: none; background: #374151; padding: 20px; border-radius: 8px;">
+        <h3>🔍 Verification Steps:</h3>
+        <ol>
+            <li><strong>Hard Refresh:</strong> Ctrl+F5 or Cmd+Shift+R</li>
+            <li><strong>Check NVDA Trades:</strong> Look for the two NVDA entries</li>
+            <li><strong>Verify P&L:</strong> 
+                <ul>
+                    <li>Dec trade: Should show <span class="highlight">+$138.00</span> (not -$1336)</li>
+                    <li>Oct trade: Should show <span class="highlight">-$91.00</span> (not -$1148)</li>
+                </ul>
+            </li>
+            <li><strong>No "Static" Labels:</strong> Closed trades shouldn't show "Static: $X.XX"</li>
+            <li><strong>Portfolio Total:</strong> Should be much more accurate now</li>
+        </ol>
+
+        <h4>🚨 If Still Wrong:</h4>
+        <ul>
+            <li>Click "Force Refresh Data" in the app</li>
+            <li>Use "Debug Trades" to inspect the data</li>
+            <li>Clear browser cache completely</li>
+            <li>Check browser console for error messages</li>
+        </ul>
+    </div>
+
+    <script>
+        function testApp() {
+            window.open('/', '_blank');
+        }
+
+        function showSteps() {
+            const steps = document.getElementById('steps');
+            steps.style.display = steps.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function clearData() {
+            if (confirm('This will clear all trade data. Continue?')) {
+                localStorage.removeItem('scannerProTrades');
+                localStorage.removeItem('lastPortfolioPriceUpdate');
+                alert('Trade data cleared! Refresh the main app.');
+            }
+        }
+
+        // Auto-show steps after 2 seconds
+        setTimeout(() => {
+            document.getElementById('steps').style.display = 'block';
+        }, 2000);
+    </script>
+</body>
+</html>

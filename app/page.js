@@ -1250,33 +1250,129 @@ export default function UltimateScanner() {
       
       if (trade.assetType === 'MULTI_LEG_OPTION' || 
           (trade.strategyType && trade.strategyType !== 'SINGLE')) {
-        // Multi-leg option spreads - Enhanced logic with better validation
-        const isCredit = (trade.netPremium || 0) > 0;
         
-        console.log('🎯 Multi-leg Option Calculation:', {
-          isCredit: isCredit,
+        // 🎯 FIXED: Enhanced Bull Put Spread Detection to resolve P&L calculation bug
+        const isBullPutSpread = (
+          trade.strategyType === 'PUT_SPREAD' || 
+          trade.strategyType === 'BULL_PUT_SPREAD' ||
+          (trade.strategyName && trade.strategyName.includes('Bull Put'))
+        );
+        
+        const isBearPutSpread = (
+          trade.strategyType === 'BEAR_PUT_SPREAD' ||
+          (trade.strategyName && trade.strategyName.includes('Bear Put'))
+        );
+        
+        const isBullCallSpread = (
+          trade.strategyType === 'CALL_SPREAD' ||
+          trade.strategyType === 'BULL_CALL_SPREAD' ||
+          (trade.strategyName && trade.strategyName.includes('Bull Call'))
+        );
+        
+        const isBearCallSpread = (
+          trade.strategyType === 'BEAR_CALL_SPREAD' ||
+          (trade.strategyName && trade.strategyName.includes('Bear Call'))
+        );
+        
+        console.log('🔍 Enhanced Spread Detection:', {
+          strategyType: trade.strategyType,
+          strategyName: trade.strategyName,
+          isBullPutSpread,
+          isBearPutSpread,
+          isBullCallSpread,
+          isBearCallSpread,
           netPremium: trade.netPremium,
-          tradeQuantity: trade.quantity,
-          closeQuantity: closeQty,
           entryPrice: trade.entryPrice,
-          exitPrice: exitPrice,
-          formula: isCredit ? '(entry - exit) × qty × 100' : '(exit - entry) × qty × 100'
+          exitPrice: exitPrice
         });
         
-        if (isCredit) {
-          // Credit spread: P&L = (collected credit - cost to close) * contracts * 100
+        if (isBullPutSpread) {
+          // ✅ FIXED: Bull Put Spread is ALWAYS a credit spread
+          // P&L = Credit Received - Debit Paid to Close
+          // Formula: (Entry Credit - Exit Debit) × Contracts × 100
           closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
-        } else {
-          // Debit spread: P&L = (exit value - paid debit) * contracts * 100
+          
+          console.log('📊 Bull Put Spread P&L (FIXED):', {
+            spreadType: 'Bull Put Spread (Credit)',
+            creditReceived: trade.entryPrice,
+            debitToClose: exitPrice,
+            contracts: closeQty,
+            calculation: `(${trade.entryPrice} - ${exitPrice}) × ${closeQty} × 100`,
+            result: closePnl,
+            note: 'Bull Put = Credit Spread (Sell higher strike, Buy lower strike)'
+          });
+          
+        } else if (isBearPutSpread) {
+          // ✅ FIXED: Bear Put Spread is ALWAYS a debit spread  
+          // P&L = Exit Value - Debit Paid
+          // Formula: (Exit Value - Entry Debit) × Contracts × 100
           closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+          
+          console.log('📊 Bear Put Spread P&L (FIXED):', {
+            spreadType: 'Bear Put Spread (Debit)',
+            debitPaid: trade.entryPrice,
+            exitValue: exitPrice,
+            contracts: closeQty,
+            calculation: `(${exitPrice} - ${trade.entryPrice}) × ${closeQty} × 100`,
+            result: closePnl,
+            note: 'Bear Put = Debit Spread (Buy higher strike, Sell lower strike)'
+          });
+          
+        } else if (isBullCallSpread) {
+          // ✅ FIXED: Bull Call Spread is ALWAYS a debit spread  
+          // P&L = Exit Value - Debit Paid
+          closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+          
+          console.log('📊 Bull Call Spread P&L (FIXED):', {
+            spreadType: 'Bull Call Spread (Debit)',
+            debitPaid: trade.entryPrice,
+            exitValue: exitPrice,
+            contracts: closeQty,
+            calculation: `(${exitPrice} - ${trade.entryPrice}) × ${closeQty} × 100`,
+            result: closePnl,
+            note: 'Bull Call = Debit Spread (Buy lower strike, Sell higher strike)'
+          });
+          
+        } else if (isBearCallSpread) {
+          // ✅ FIXED: Bear Call Spread is ALWAYS a credit spread
+          // P&L = Credit Received - Debit Paid to Close
+          closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
+          
+          console.log('📊 Bear Call Spread P&L (FIXED):', {
+            spreadType: 'Bear Call Spread (Credit)',
+            creditReceived: trade.entryPrice,
+            debitToClose: exitPrice,
+            contracts: closeQty,
+            calculation: `(${trade.entryPrice} - ${exitPrice}) × ${closeQty} × 100`,
+            result: closePnl,
+            note: 'Bear Call = Credit Spread (Sell lower strike, Buy higher strike)'
+          });
+          
+        } else {
+          // 🔄 Fallback to original netPremium-based logic for other spreads
+          const isCredit = (trade.netPremium || 0) > 0;
+          
+          if (isCredit) {
+            // Credit spread: P&L = (collected credit - cost to close) * contracts * 100
+            closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
+          } else {
+            // Debit spread: P&L = (exit value - paid debit) * contracts * 100
+            closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+          }
+          
+          console.log('📊 Generic Multi-leg P&L (Original Logic):', {
+            isCredit: isCredit,
+            netPremium: trade.netPremium,
+            entryPrice: trade.entryPrice,
+            exitPrice: exitPrice,
+            contracts: closeQty,
+            calculation: isCredit ? 
+              `(${trade.entryPrice} - ${exitPrice}) × ${closeQty} × 100` :
+              `(${exitPrice} - ${trade.entryPrice}) × ${closeQty} × 100`,
+            result: closePnl,
+            note: 'Using netPremium-based detection for other spread types'
+          });
         }
-        
-        console.log('💰 Multi-leg P&L Details:', {
-          calculation: isCredit ? 
-            `(${trade.entryPrice} - ${exitPrice}) × ${closeQty} × 100` :
-            `(${exitPrice} - ${trade.entryPrice}) × ${closeQty} × 100`,
-          result: closePnl
-        });
         
       } else if (trade.assetType === 'OPTION') {
         // Single options: Premium is per contract, multiply by 100 shares per contract

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bull Put Spread P&L Calculator Test</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; margin-bottom: 30px; }
+        .test-section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #007bff; }
+        .input-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+        button { background: #007bff; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        button:hover { background: #0056b3; }
+        .result { background: #e9ecef; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .profit { color: #28a745; font-weight: bold; }
+        .loss { color: #dc3545; font-weight: bold; }
+        .current-logic, .fixed-logic { background: #fff; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .current-logic { border-left: 4px solid #dc3545; }
+        .fixed-logic { border-left: 4px solid #28a745; }
+        .calculation-step { background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 4px; font-family: 'Courier New', monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Bull Put Spread P&L Calculator - Bug Analysis</h1>
+        
+        <div class="test-section">
+            <h3>Your COP Bull Put Spread Example</h3>
+            <div class="input-group">
+                <label>Symbol:</label>
+                <input type="text" id="symbol" value="COP" readonly>
+            </div>
+            <div class="input-group">
+                <label>Strategy Type:</label>
+                <select id="strategyType">
+                    <option value="PUT_SPREAD" selected>Bull Put Spread</option>
+                    <option value="MULTI_LEG_OPTION">Multi-Leg Option</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Entry Credit Received (per contract):</label>
+                <input type="number" id="entryPrice" value="1.10" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Exit Debit Paid to Close (per contract):</label>
+                <input type="number" id="exitPrice" value="0.79" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Number of Contracts:</label>
+                <input type="number" id="quantity" value="2" min="1">
+            </div>
+            <div class="input-group">
+                <label>Net Premium (Credit = positive):</label>
+                <input type="number" id="netPremium" value="1.10" step="0.01">
+            </div>
+            
+            <button onclick="calculatePnL()">Calculate P&L</button>
+            <button onclick="loadTestCases()">Load More Test Cases</button>
+        </div>
+
+        <div id="results" class="result" style="display: none;">
+            <h3>📊 P&L Calculation Results</h3>
+            
+            <div class="current-logic">
+                <h4>❌ Current Logic (BUGGY)</h4>
+                <div id="currentCalculation"></div>
+                <div id="currentResult"></div>
+            </div>
+            
+            <div class="fixed-logic">
+                <h4>✅ Fixed Logic (CORRECT)</h4>
+                <div id="fixedCalculation"></div>
+                <div id="fixedResult"></div>
+            </div>
+            
+            <div id="explanation" style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 5px;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Additional Test Cases</h3>
+            <div id="testCases"></div>
+        </div>
+    </div>
+
+    <script>
+        function calculatePnL() {
+            const symbol = document.getElementById('symbol').value;
+            const strategyType = document.getElementById('strategyType').value;
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            const exitPrice = parseFloat(document.getElementById('exitPrice').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const netPremium = parseFloat(document.getElementById('netPremium').value);
+            
+            // Current buggy logic (from the app)
+            const isCredit = netPremium > 0;
+            let currentPnl, fixedPnl;
+            
+            if (isCredit) {
+                // CURRENT BUGGY LOGIC
+                currentPnl = (entryPrice - exitPrice) * quantity * 100;
+                
+                // FIXED LOGIC - For Bull Put Spreads (credit spreads)
+                // P&L = (Credit Received - Debit Paid to Close) × Contracts × 100
+                // This is actually CORRECT for credit spreads!
+                fixedPnl = (entryPrice - exitPrice) * quantity * 100;
+            } else {
+                // CURRENT LOGIC for debit spreads
+                currentPnl = (exitPrice - entryPrice) * quantity * 100;
+                
+                // FIXED LOGIC for debit spreads  
+                fixedPnl = (exitPrice - entryPrice) * quantity * 100;
+            }
+            
+            // Wait... let me check the logic again
+            // For Bull Put Spread: You SELL higher strike, BUY lower strike = NET CREDIT
+            // Entry: You receive $1.10 credit
+            // Exit: You pay $0.79 debit to close
+            // P&L = Credit received - Debit paid = $1.10 - $0.79 = $0.31 profit per contract
+            
+            // The current calculation should be CORRECT: (1.10 - 0.79) × 2 × 100 = $62
+            // Let me check what's actually happening...
+            
+            document.getElementById('currentCalculation').innerHTML = `
+                <div class="calculation-step">Strategy: ${strategyType} (${isCredit ? 'Credit' : 'Debit'} spread)</div>
+                <div class="calculation-step">Formula: ${isCredit ? '(Entry Credit - Exit Debit)' : '(Exit Value - Entry Debit)'} × Qty × 100</div>
+                <div class="calculation-step">Calculation: ${isCredit ? 
+                    `(${entryPrice} - ${exitPrice}) × ${quantity} × 100` : 
+                    `(${exitPrice} - ${entryPrice}) × ${quantity} × 100`}</div>
+                <div class="calculation-step">Result: ${currentPnl}</div>
+            `;
+            
+            document.getElementById('currentResult').innerHTML = `
+                <strong>Current App Result: <span class="${currentPnl >= 0 ? 'profit' : 'loss'}">$${currentPnl.toFixed(2)}</span></strong>
+            `;
+            
+            // Let's check if the issue is in how the trade is being stored or classified
+            document.getElementById('fixedCalculation').innerHTML = `
+                <div class="calculation-step">🔍 Analysis: Bull Put Spread = CREDIT SPREAD</div>
+                <div class="calculation-step">✅ You SELL 95 Put (receive premium)</div>
+                <div class="calculation-step">✅ You BUY 90 Put (pay premium)</div>
+                <div class="calculation-step">✅ Net Result = CREDIT of $${entryPrice}</div>
+                <div class="calculation-step">✅ To close: Pay $${exitPrice} debit</div>
+                <div class="calculation-step">✅ P&L = $${entryPrice} - $${exitPrice} = $${(entryPrice - exitPrice).toFixed(2)} per contract</div>
+                <div class="calculation-step">✅ Total P&L = $${(entryPrice - exitPrice).toFixed(2)} × ${quantity} × 100 = $${((entryPrice - exitPrice) * quantity * 100).toFixed(2)}</div>
+            `;
+            
+            fixedPnl = (entryPrice - exitPrice) * quantity * 100;
+            
+            document.getElementById('fixedResult').innerHTML = `
+                <strong>Fixed Result: <span class="${fixedPnl >= 0 ? 'profit' : 'loss'}">$${fixedPnl.toFixed(2)}</span></strong>
+            `;
+            
+            // Explanation
+            let explanation = '';
+            if (currentPnl === fixedPnl && fixedPnl > 0) {
+                explanation = `
+                    <h4>🤔 Wait - The Logic Seems Correct!</h4>
+                    <p>The calculation logic appears to be working correctly. If you're seeing a loss of -$62 instead of a gain of +$62, 
+                    the issue might be:</p>
+                    <ul>
+                        <li><strong>Trade Classification:</strong> The spread might be stored as a debit spread instead of credit spread</li>
+                        <li><strong>Entry Price Sign:</strong> The net premium might be stored as negative instead of positive</li>
+                        <li><strong>Price Reversal:</strong> Entry and exit prices might be swapped in storage</li>
+                        <li><strong>Strategy Type:</strong> The spread might be classified as a different strategy type</li>
+                    </ul>
+                    <p><strong>Next Step:</strong> We need to check how your specific trade is stored in the app.</p>
+                `;
+            } else if (Math.abs(currentPnl + fixedPnl) < 0.01) {
+                explanation = `
+                    <h4>🎯 Found the Bug!</h4>
+                    <p>The sign is flipped! The app is calculating -$${Math.abs(currentPnl).toFixed(2)} instead of +$${fixedPnl.toFixed(2)}.</p>
+                    <p>This suggests the trade is being treated as the opposite type or the formula has a sign error.</p>
+                `;
+            }
+            
+            document.getElementById('explanation').innerHTML = explanation;
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        function loadTestCases() {
+            const testCases = `
+                <h4>Test Case 1: Your COP Example</h4>
+                <p>Bull Put Spread: Sold 95 Put, Bought 90 Put</p>
+                <p>Credit: $1.10, Close: $0.79, Contracts: 2</p>
+                <p>Expected: +$62, Actual: -$62 ❌</p>
+                
+                <h4>Test Case 2: Bull Call Spread (Debit)</h4>
+                <p>Buy 100 Call ($3.50), Sell 105 Call ($2.00)</p>
+                <p>Net Debit: $1.50, Close: $2.25, Contracts: 1</p>
+                <p>Expected: +$75 (2.25 - 1.50) × 1 × 100</p>
+                
+                <h4>Test Case 3: Bear Put Spread (Debit)</h4>
+                <p>Buy 100 Put ($4.00), Sell 95 Put ($2.50)</p>
+                <p>Net Debit: $1.50, Close: $0.75, Contracts: 3</p>
+                <p>Expected: -$225 (0.75 - 1.50) × 3 × 100</p>
+            `;
+            document.getElementById('testCases').innerHTML = testCases;
+        }
+        
+        // Auto-calculate on page load
+        calculatePnL();
+    </script>
+</body>
+</html>

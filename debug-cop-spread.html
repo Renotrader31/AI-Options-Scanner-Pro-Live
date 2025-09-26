@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug COP Bull Put Spread</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .debug-section { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #007bff; }
+        .code-block { background: #263238; color: #e8eaf6; padding: 15px; border-radius: 5px; font-family: 'Courier New', monospace; overflow-x: auto; margin: 10px 0; }
+        .result { padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Debug: COP Bull Put Spread P&L Issue</h1>
+        
+        <div class="debug-section">
+            <h3>Your Trade Details</h3>
+            <p><strong>Strategy:</strong> Bull Put Spread</p>
+            <p><strong>Symbol:</strong> COP</p>
+            <p><strong>Legs:</strong> Sold 95 Put / Bought 90 Put</p>
+            <p><strong>Credit Received:</strong> $1.10 per contract</p>
+            <p><strong>Closed at Debit:</strong> $0.79 per contract</p>
+            <p><strong>Expected Gain:</strong> $1.10 - $0.79 = $0.31 × 2 contracts × 100 = $62</p>
+            <p><strong>Actual Result in App:</strong> -$62 (WRONG!)</p>
+        </div>
+
+        <div class="debug-section">
+            <h3>🔍 Code Analysis: Multi-Leg P&L Calculation</h3>
+            <div class="code-block">
+if (trade.assetType === 'MULTI_LEG_OPTION' || 
+    (trade.strategyType && trade.strategyType !== 'SINGLE')) {
+    
+    // Multi-leg option spreads - Enhanced logic with better validation
+    const isCredit = (trade.netPremium || 0) > 0;
+    
+    if (isCredit) {
+        // Credit spread: P&L = (collected credit - cost to close) * contracts * 100
+        closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
+    } else {
+        // Debit spread: P&L = (exit value - paid debit) * contracts * 100
+        closePnl = (exitPrice - trade.entryPrice) * closeQty * 100;
+    }
+}
+            </div>
+        </div>
+
+        <div class="debug-section">
+            <h3>🧪 Simulate Different Scenarios</h3>
+            <button onclick="testScenario1()">Test: Correct Classification</button>
+            <button onclick="testScenario2()">Test: Wrong netPremium Sign</button>
+            <button onclick="testScenario3()">Test: Debit Classification Bug</button>
+            <button onclick="testScenario4()">Test: Entry/Exit Swap</button>
+            
+            <div id="testResults"></div>
+        </div>
+
+        <div class="debug-section">
+            <h3>📋 Potential Root Causes</h3>
+            <div id="rootCauses">
+                <h4>1. Trade Classification Issue</h4>
+                <p>The Bull Put Spread might be stored with <code>strategyType = 'BEAR_PUT_SPREAD'</code> instead of <code>'PUT_SPREAD'</code></p>
+                
+                <h4>2. Net Premium Calculation Error</h4>
+                <p>When creating the spread, the net premium might be calculated incorrectly:</p>
+                <div class="code-block">
+// WRONG: netPremium = totalCost - totalCredit = -1.10
+// RIGHT: netPremium = totalCredit - totalCost = +1.10</div>
+                
+                <h4>3. Entry Price Storage Issue</h4>
+                <p>The <code>entryPrice</code> might be stored as the debit amount instead of the credit amount</p>
+                
+                <h4>4. Credit/Debit Logic Reversal</h4>
+                <p>The app might be treating your credit spread as a debit spread due to sign confusion</p>
+            </div>
+        </div>
+
+        <div class="debug-section">
+            <h3>🔧 Proposed Fix</h3>
+            <p>Based on the analysis, here's what needs to be fixed:</p>
+            
+            <div class="code-block">
+// CURRENT BUGGY LOGIC - Check for Bull Put Spread specifically
+if (trade.strategyType === 'PUT_SPREAD' || trade.strategyType === 'BULL_PUT_SPREAD') {
+    // Bull Put Spread is ALWAYS a credit spread
+    // P&L = Credit Received - Debit Paid to Close
+    const isCredit = true; // Force correct classification
+    
+    if (isCredit) {
+        // Credit spread: P&L = (credit received - debit to close) × contracts × 100
+        closePnl = (trade.entryPrice - exitPrice) * closeQty * 100;
+    }
+} else {
+    // Existing logic for other strategies...
+}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testScenario1() {
+            // Test: Correctly classified as credit spread
+            const trade = {
+                symbol: 'COP',
+                strategyType: 'PUT_SPREAD',
+                netPremium: 1.10, // Positive = credit
+                entryPrice: 1.10,
+                assetType: 'MULTI_LEG_OPTION'
+            };
+            const exitPrice = 0.79;
+            const quantity = 2;
+            
+            const isCredit = (trade.netPremium || 0) > 0;
+            const closePnl = isCredit ? 
+                (trade.entryPrice - exitPrice) * quantity * 100 :
+                (exitPrice - trade.entryPrice) * quantity * 100;
+            
+            showResult('Scenario 1: Correct Classification', {
+                isCredit,
+                netPremium: trade.netPremium,
+                entryPrice: trade.entryPrice,
+                exitPrice,
+                quantity,
+                calculation: `(${trade.entryPrice} - ${exitPrice}) × ${quantity} × 100`,
+                result: closePnl,
+                expected: 62,
+                status: closePnl === 62 ? 'correct' : 'incorrect'
+            });
+        }
+        
+        function testScenario2() {
+            // Test: Wrong netPremium sign (stored as negative)
+            const trade = {
+                symbol: 'COP',
+                strategyType: 'PUT_SPREAD',
+                netPremium: -1.10, // WRONG: Negative when should be positive
+                entryPrice: 1.10,
+                assetType: 'MULTI_LEG_OPTION'
+            };
+            const exitPrice = 0.79;
+            const quantity = 2;
+            
+            const isCredit = (trade.netPremium || 0) > 0;
+            const closePnl = isCredit ? 
+                (trade.entryPrice - exitPrice) * quantity * 100 :
+                (exitPrice - trade.entryPrice) * quantity * 100;
+            
+            showResult('Scenario 2: Wrong netPremium Sign', {
+                isCredit,
+                netPremium: trade.netPremium,
+                entryPrice: trade.entryPrice,
+                exitPrice,
+                quantity,
+                calculation: isCredit ? 
+                    `(${trade.entryPrice} - ${exitPrice}) × ${quantity} × 100` :
+                    `(${exitPrice} - ${trade.entryPrice}) × ${quantity} × 100`,
+                result: closePnl,
+                expected: 62,
+                status: closePnl === -62 ? 'matches_bug' : 'different'
+            });
+        }
+        
+        function testScenario3() {
+            // Test: Classified as debit spread instead of credit
+            const trade = {
+                symbol: 'COP',
+                strategyType: 'BEAR_PUT_SPREAD', // WRONG strategy type
+                netPremium: 0, // No netPremium set
+                entryPrice: 1.10,
+                assetType: 'MULTI_LEG_OPTION'
+            };
+            const exitPrice = 0.79;
+            const quantity = 2;
+            
+            const isCredit = (trade.netPremium || 0) > 0;
+            const closePnl = isCredit ? 
+                (trade.entryPrice - exitPrice) * quantity * 100 :
+                (exitPrice - trade.entryPrice) * quantity * 100;
+            
+            showResult('Scenario 3: Wrong Strategy Classification', {
+                isCredit,
+                strategyType: trade.strategyType,
+                netPremium: trade.netPremium,
+                entryPrice: trade.entryPrice,
+                exitPrice,
+                quantity,
+                calculation: isCredit ? 
+                    `(${trade.entryPrice} - ${exitPrice}) × ${quantity} × 100` :
+                    `(${exitPrice} - ${trade.entryPrice}) × ${quantity} × 100`,
+                result: closePnl,
+                expected: 62,
+                status: closePnl === -62 ? 'matches_bug' : 'different'
+            });
+        }
+        
+        function testScenario4() {
+            // Test: Entry and exit prices swapped
+            const trade = {
+                symbol: 'COP',
+                strategyType: 'PUT_SPREAD',
+                netPremium: 1.10,
+                entryPrice: 0.79, // WRONG: Should be 1.10
+                assetType: 'MULTI_LEG_OPTION'
+            };
+            const exitPrice = 1.10; // WRONG: Should be 0.79
+            const quantity = 2;
+            
+            const isCredit = (trade.netPremium || 0) > 0;
+            const closePnl = isCredit ? 
+                (trade.entryPrice - exitPrice) * quantity * 100 :
+                (exitPrice - trade.entryPrice) * quantity * 100;
+            
+            showResult('Scenario 4: Entry/Exit Price Swap', {
+                isCredit,
+                netPremium: trade.netPremium,
+                entryPrice: trade.entryPrice,
+                exitPrice,
+                quantity,
+                calculation: `(${trade.entryPrice} - ${exitPrice}) × ${quantity} × 100`,
+                result: closePnl,
+                expected: 62,
+                status: closePnl === -62 ? 'matches_bug' : 'different'
+            });
+        }
+        
+        function showResult(title, data) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${data.status}`;
+            
+            let statusText = '';
+            if (data.status === 'correct') {
+                statusText = '✅ CORRECT - Matches expected +$62';
+            } else if (data.status === 'matches_bug') {
+                statusText = '🐛 MATCHES BUG - Shows -$62 (this might be the issue!)';
+            } else {
+                statusText = '⚠️ DIFFERENT - Shows unexpected result';
+            }
+            
+            resultDiv.innerHTML = `
+                <h4>${title}</h4>
+                <p><strong>Is Credit Spread:</strong> ${data.isCredit}</p>
+                ${data.strategyType ? `<p><strong>Strategy Type:</strong> ${data.strategyType}</p>` : ''}
+                <p><strong>Net Premium:</strong> ${data.netPremium}</p>
+                <p><strong>Calculation:</strong> ${data.calculation}</p>
+                <p><strong>Result:</strong> $${data.result}</p>
+                <p><strong>Status:</strong> ${statusText}</p>
+            `;
+            
+            const container = document.getElementById('testResults');
+            container.appendChild(resultDiv);
+        }
+        
+        // Auto-run the most likely scenario
+        setTimeout(() => {
+            document.getElementById('testResults').innerHTML = '<h4>Click buttons above to test different scenarios</h4>';
+        }, 100);
+    </script>
+</body>
+</html>
